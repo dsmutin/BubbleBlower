@@ -18,5 +18,85 @@
       "mismatches_per_100kbp": 202.75539936006794,
       "duplication": 0.09928577233474647
     }
+  },
+  "low75": {
+    "megahit_k21": {
+      "n50": 126.0,
+      "n_contigs": 122002.0,
+      "total_length": 16808804.0,
+      "genome_fraction": 0.01392781607229331,
+      "misassemblies": 0.0,
+      "mismatches_per_100kbp": 82.57670562966513,
+      "duplication": 0.01395401724107251
+    },
+    "megahit_final": {
+      "n50": 465.0,
+      "n_contigs": 2684.0,
+      "total_length": 1350101.0,
+      "genome_fraction": 0.006598221162079152,
+      "misassemblies": 1.0,
+      "mismatches_per_100kbp": 139.19942732801496,
+      "duplication": 0.006615901625564304
+    }
+  },
+  "low75half": {
+    "megahit_k21": {
+      "n50": 126.0,
+      "n_contigs": 108039.0,
+      "total_length": 14220724.0,
+      "genome_fraction": 0.03330255235107892,
+      "misassemblies": 0.0,
+      "mismatches_per_100kbp": 94.01644459962742,
+      "duplication": 0.03336177209135006
+    },
+    "megahit_final": {
+      "n50": 429.0,
+      "n_contigs": 4090.0,
+      "total_length": 1881332.0,
+      "genome_fraction": 0.01804325076841657,
+      "misassemblies": 2.0,
+      "mismatches_per_100kbp": 232.6635771549887,
+      "duplication": 0.018165536967597373
+    }
+  },
+  "heldout_genera": {
+    "megahit_k21": {
+      "n50": 126.0,
+      "n_contigs": 140306.0,
+      "total_length": 17432182.0,
+      "genome_fraction": 0.04562730952940455,
+      "misassemblies": 11.0,
+      "mismatches_per_100kbp": 147.96939450602466,
+      "duplication": 0.04568909901564989
+    },
+    "megahit_final": {
+      "n50": 390.0,
+      "n_contigs": 6438.0,
+      "total_length": 2632196.0,
+      "genome_fraction": 0.027577383935912424,
+      "misassemblies": 45.0,
+      "mismatches_per_100kbp": 318.9095429097524,
+      "duplication": 0.027601694918081666
+    }
+  },
+  "high100": {
+    "megahit_k21": {
+      "n50": 126.0,
+      "n_contigs": 149792.0,
+      "total_length": 19521470.0,
+      "genome_fraction": 0.0020463656454703426,
+      "misassemblies": 0.0,
+      "mismatches_per_100kbp": 69.96923047150916,
+      "duplication": 0.0020481194948089
+    },
+    "megahit_final": {
+      "n50": 428.0,
+      "n_contigs": 988.0,
+      "total_length": 520172.0,
+      "genome_fraction": 0.0006336511506097001,
+      "misassemblies": 2.0,
+      "mismatches_per_100kbp": 103.55364860534728,
+      "duplication": 0.0006339273571086397
+    }
   }
 }
