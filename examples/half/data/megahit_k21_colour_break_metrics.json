@@ -1,0 +1,137 @@
+{
+  "half_strains": {
+    "megahit_final": {
+      "n50": 460.0,
+      "n_contigs": 10071.0,
+      "total_length": 4770815.0,
+      "genome_fraction": 0.09899709492135374,
+      "misassemblies": 24.0,
+      "mismatches_per_100kbp": 202.75539936006794,
+      "duplication": 0.09928577233474647
+    },
+    "k21_read_colour_break": {
+      "n50": 176.0,
+      "n_contigs": 95018.0,
+      "total_length": 14194167.0,
+      "genome_fraction": 0.12434193795126237,
+      "misassemblies": 3.0,
+      "mismatches_per_100kbp": 100.38145291751535,
+      "duplication": 0.12475325983450179
+    },
+    "n_k21_contigs": 93070,
+    "n_pieces": 95018,
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "genome_fraction"
+    ]
+  },
+  "heldout_genera": {
+    "megahit_final": {
+      "n50": 390.0,
+      "n_contigs": 6438.0,
+      "total_length": 2632196.0,
+      "genome_fraction": 0.027577383935912424,
+      "misassemblies": 45.0,
+      "mismatches_per_100kbp": 318.9095429097524,
+      "duplication": 0.027601694918081666
+    },
+    "k21_read_colour_break": {
+      "n50": 126.0,
+      "n_contigs": 143051.0,
+      "total_length": 17335791.0,
+      "genome_fraction": 0.040475427613605744,
+      "misassemblies": 2.0,
+      "mismatches_per_100kbp": 113.05816293657053,
+      "duplication": 0.04052729697354963
+    },
+    "n_k21_contigs": 140306,
+    "n_pieces": 143051,
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "genome_fraction"
+    ]
+  },
+  "low75": {
+    "megahit_final": {
+      "n50": 465.0,
+      "n_contigs": 2684.0,
+      "total_length": 1350101.0,
+      "genome_fraction": 0.006598221162079152,
+      "misassemblies": 1.0,
+      "mismatches_per_100kbp": 139.19942732801496,
+      "duplication": 0.006615901625564304
+    },
+    "k21_read_colour_break": {
+      "n50": 126.0,
+      "n_contigs": 121996.0,
+      "total_length": 16802385.0,
+      "genome_fraction": 0.01391237477089706,
+      "misassemblies": 0.0,
+      "mismatches_per_100kbp": 82.52772249075917,
+      "duplication": 0.013938288613567508
+    },
+    "n_k21_contigs": 122002,
+    "n_pieces": 121996,
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "genome_fraction"
+    ]
+  },
+  "low75half": {
+    "megahit_final": {
+      "n50": 429.0,
+      "n_contigs": 4090.0,
+      "total_length": 1881332.0,
+      "genome_fraction": 0.01804325076841657,
+      "misassemblies": 2.0,
+      "mismatches_per_100kbp": 232.6635771549887,
+      "duplication": 0.018165536967597373
+    },
+    "k21_read_colour_break": {
+      "n50": 126.0,
+      "n_contigs": 108075.0,
+      "total_length": 14217362.0,
+      "genome_fraction": 0.033216139269047706,
+      "misassemblies": 0.0,
+      "mismatches_per_100kbp": 94.05371821944722,
+      "duplication": 0.0332751420149341
+    },
+    "n_k21_contigs": 108039,
+    "n_pieces": 108075,
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "genome_fraction"
+    ]
+  },
+  "high100": {
+    "megahit_final": {
+      "n50": 428.0,
+      "n_contigs": 988.0,
+      "total_length": 520172.0,
+      "genome_fraction": 0.0006336511506097001,
+      "misassemblies": 2.0,
+      "mismatches_per_100kbp": 103.55364860534728,
+      "duplication": 0.0006339273571086397
+    },
+    "k21_read_colour_break": {
+      "n50": 126.0,
+      "n_contigs": 149784.0,
+      "total_length": 19515730.0,
+      "genome_fraction": 0.0020427055997108527,
+      "misassemblies": 0.0,
+      "mismatches_per_100kbp": 69.60809852968795,
+      "duplication": 0.002044510231410202
+    },
+    "n_k21_contigs": 149792,
+    "n_pieces": 149784,
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "genome_fraction"
+    ]
+  }
+}

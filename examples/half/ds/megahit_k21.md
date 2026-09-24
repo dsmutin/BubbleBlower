@@ -76,3 +76,17 @@ A misassembly here is one contig with two alignments of at least 200 bp on diffe
 | low75half | colour break | 426 | 0.0180 | 1 | 230.8 | 0.0181 |
 | high100 | final | 428 | 0.0006 | 2 | 103.6 | 0.0006 |
 | high100 | colour break | 421 | 0.0006 | 0 | 100.0 | 0.0006 |
+
+## Colour break on the k21 contigs
+
+`read_colour_break` on `k21.contigs.fa`, with the same Illumina reads, is a mode on the initial MEGAHIT sequences rather than on the final FASTA. Pieces shorter than 80 bp are dropped. Against the final contigs it wins misassemblies, mismatches, and genome fraction on every finished set. Duplication rises with that extra coverage. N50 falls to the k21 length.
+
+| dataset | assembly | N50 | genome fraction | misassemblies | mismatches / 100 kbp | duplication |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| half_strains | k21 colour break | 176 | 0.1243 | 3 | 100.4 | 0.1248 |
+| heldout_genera | k21 colour break | 126 | 0.0405 | 2 | 113.1 | 0.0405 |
+| low75 | k21 colour break | 126 | 0.0139 | 0 | 82.5 | 0.0139 |
+| low75half | k21 colour break | 126 | 0.0332 | 0 | 94.1 | 0.0333 |
+| high100 | k21 colour break | 126 | 0.0020 | 0 | 69.6 | 0.0020 |
+
+The k21 contigs already contained two-genome joins. On `half_strains` the break cuts those from 9 to 3, and mismatches from 116.8 to 100.4, while genome fraction stays above the final assembly (0.1243 versus 0.0990; uncut k21 was 0.1312). On `heldout_genera` the same cut is 11 to 2 misassemblies and 148.0 to 113.1 mismatches per 100 kbp, with genome fraction 0.0405 versus 0.0276 for the final contigs (uncut k21 was 0.0456). `low75`, `low75half`, and `high100` already had no k21 misassembly, and the break does not add one. Their scores stay on the k21 side of the comparison.
