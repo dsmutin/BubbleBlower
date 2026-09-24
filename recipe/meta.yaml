@@ -29,7 +29,7 @@ test:
     - bubbleblower --version
 
 about:
-  home: https://github.com/dsmutin/BubbleBlower
+  home: https://github.com/dsmutin/divide-et-impera
   license: MIT
   license_file: LICENSE
   summary: "Iterative debubbling of totally coloured assembly graphs"

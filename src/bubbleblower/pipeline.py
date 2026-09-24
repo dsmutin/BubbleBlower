@@ -13,9 +13,29 @@ from bubbleblower.graph import AssemblyGraph, from_cdbg
 from bubbleblower.search import SearchResult, greedy_search
 
 
+def _read_coverage(path: Path) -> dict[str, float] | None:
+    if not path.is_file():
+        return None
+    rows: dict[str, float] = {}
+    lines = [line for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
+    if not lines:
+        raise ValueError(f"empty coverage table: {path}")
+    for line in lines[1:]:
+        ident, value = line.split("\t")
+        rows[ident] = float(value)
+    return rows
+
+
 def load_assembly(path: str | Path, node_coverage: dict[str, float] | None = None) -> AssemblyGraph:
-    """Load a MetaMetro CDBG directory."""
-    return from_cdbg(load_cdbg(path), node_coverage=node_coverage)
+    """Load a MetaMetro CDBG directory.
+
+    Optional ``node_coverage.tsv`` and ``link_coverage.tsv`` in that directory
+    supply coverage. They are not inferred when absent.
+    """
+    root = Path(path)
+    nodes = node_coverage if node_coverage is not None else _read_coverage(root / "node_coverage.tsv")
+    links = _read_coverage(root / "link_coverage.tsv")
+    return from_cdbg(load_cdbg(root), node_coverage=nodes, link_coverage=links)
 
 
 def resolve(graph: AssemblyGraph, **kwargs) -> SearchResult:

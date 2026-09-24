@@ -18,5 +18,8 @@ Scaffold contracts from `/start-dev`. Add tool-specific rows when the product sp
 | Reversible pop, duplicate, split, merge | `bubbleblower.edits` |
 | Global score and greedy search | `bubbleblower.score`, `bubbleblower.search.greedy_search` |
 | 50-bubble graph-only benchmark | `bubbleblower.generate.generate_bubble_benchmark` |
+| Beam search and MCMC | `bubbleblower.search.beam_search`, `mcmc_search` |
+| Output tables and resolved CDBG | `bubbleblower.report.write_result` |
+| Read-level graph via MetaMetro | `examples/reads/run.py` |
 | English docs on public APIs | baseline (module/function docstrings) |
 | No `git push` unless the human asks | baseline (rule `no-push`) |

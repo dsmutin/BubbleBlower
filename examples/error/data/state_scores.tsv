@@ -1,0 +1,3 @@
+iteration	state_id	score	coverage_score	likelihood_score	topology_penalty	complexity_penalty	n_bubbles	n_instances
+0	0	-7.07921	-6.34921	-0	0.05	0.68	1	4
+1	1	-4.90234	-4.40473	-0.0217391	0	0.49	0	3

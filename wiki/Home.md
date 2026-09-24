@@ -2,19 +2,17 @@
 
 Iterative debubbling of totally coloured assembly graphs
 
-**Status:** in development. Version: see repository file `VERSION` (starts at 0.0.1).
+**Status:** in development. Version: see repository file `VERSION`.
 
 ## Starting interconnections
 
 ```
-user → bubbleblower CLI → run_pipeline() → JSON {status, ok, input_path}
-                ↑
-         tests (mandatory / optional)
-                ↑
-         examples/toy/run.py
+user → bubbleblower CLI → detect → classify → greedy / beam / MCMC
+                ↓
+         resolved CDBG + bubble_results.tsv + edit_history.tsv + state_scores.tsv
 ```
 
-Until real logic exists, `run_pipeline` is a baseline stub.
+Repository: https://github.com/dsmutin/divide-et-impera
 
 ## Pages
 

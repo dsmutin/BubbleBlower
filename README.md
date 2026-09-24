@@ -1,8 +1,8 @@
 # bubbleblower
 
-[![version](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdsmutin%2FBubbleBlower%2Fmain%2FVERSION&query=%24&label=version&color=blue)](VERSION)
-[![required tests](https://img.shields.io/github/actions/workflow/status/dsmutin/BubbleBlower/required-tests.yml?branch=main&label=required%20tests)](https://github.com/dsmutin/BubbleBlower/actions/workflows/required-tests.yml)
-[![full tests](https://img.shields.io/github/actions/workflow/status/dsmutin/BubbleBlower/full-tests.yml?branch=main&label=full%20tests)](https://github.com/dsmutin/BubbleBlower/actions/workflows/full-tests.yml)
+[![version](https://img.shields.io/badge/dynamic/yaml?url=https%3A%2F%2Fraw.githubusercontent.com%2Fdsmutin%2Fdivide-et-impera%2Fmain%2FVERSION&query=%24&label=version&color=blue)](VERSION)
+[![required tests](https://img.shields.io/github/actions/workflow/status/dsmutin/divide-et-impera/required-tests.yml?branch=main&label=required%20tests)](https://github.com/dsmutin/divide-et-impera/actions/workflows/required-tests.yml)
+[![full tests](https://img.shields.io/github/actions/workflow/status/dsmutin/divide-et-impera/full-tests.yml?branch=main&label=full%20tests)](https://github.com/dsmutin/divide-et-impera/actions/workflows/full-tests.yml)
 [![warning](https://img.shields.io/badge/warning-in%20development-yellow)](https://shields.io/badges/static-badge)
 
 Iterative debubbling of totally coloured assembly graphs
@@ -27,6 +27,8 @@ bubbleblower --version
 bubbleblower
 python examples/toy/run.py
 python examples/benchmark/run.py
+python examples/error/run.py
+python examples/reads/run.py
 ```
 
 `bubbleblower` classifies the built-in two-taxon strain bubble and prints JSON.
