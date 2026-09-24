@@ -1,0 +1,29 @@
+{
+  "half_strains": {
+    "metaflye": {
+      "n50": 618961.0,
+      "n_contigs": 309.0,
+      "total_length": 41239425.0,
+      "genome_fraction": 0.8472832925817828,
+      "misassemblies": 51.0,
+      "mismatches_per_100kbp": 605.991381865434,
+      "duplication": 0.859896118502735
+    },
+    "read_colour_break": {
+      "n50": 250.0,
+      "n_contigs": 199768.0,
+      "total_length": 44395966.0,
+      "genome_fraction": 0.5276594740384813,
+      "misassemblies": 1.0,
+      "mismatches_per_100kbp": 132.98680421960324,
+      "duplication": 0.5491006467679104
+    },
+    "n_contigs": 309,
+    "n_pieces": 199768,
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "duplication"
+    ]
+  }
+}

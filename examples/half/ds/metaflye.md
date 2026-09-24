@@ -1,6 +1,13 @@
 # metaFlye
 
-No finished metaFlye assembly is on disk yet. `badread` 0.4.2 is installed at `/mnt/tank/scratch/dsmutin/envs/badread`. It is simulating 8× ONT from the ten `half_strains` genomes (`--seed 1`) into `examples/half/work/ont/reads.fastq`, and metaFlye will write `examples/half/work/flye`. The queued SLURM job 892944 was cancelled so it would not write that same directory. The notes below record the earlier failed install.
+Flye 2.9.6-b1802 assembled the `badread` 0.4.2 8× ONT reads of the ten `half_strains` genomes (`--seed 1`). `read_colour_break` (k=21, min_run=40, min_piece=80) wins misassemblies, mismatches, and duplication against those contigs. Genome fraction falls, and N50 collapses, because 4% read error splits long contigs into short pieces. Junk reads without an accession are ignored. Numbers are in `examples/half/data/flye_colour_break_metrics.json`.
+
+| assembly | N50 | genome fraction | misassemblies | mismatches / 100 kbp | duplication |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| metaFlye | 618961 | 0.8473 | 51 | 606.0 | 0.8599 |
+| colour break | 250 | 0.5277 | 1 | 133.0 | 0.5491 |
+
+The notes below record the earlier failed install. The queued SLURM job 892944 was cancelled so it would not write the same directory.
 
 ## Reads
 
