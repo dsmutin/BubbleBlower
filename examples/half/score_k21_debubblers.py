@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
 from bubbleblower.assembly_metrics import quast_like  # noqa: E402
-from bubbleblower.colour_reads import colour_from_fastq  # noqa: E402
+from bubbleblower.colour_reads import genome_id  # noqa: E402
 from bubbleblower.debubblers import DEBUBBLERS, classify_debubble, resolve_debubbler  # noqa: E402
 from bubbleblower.detect import detect_bubbles  # noqa: E402
 from bubbleblower.fastg import load_fastg  # noqa: E402
@@ -43,6 +43,58 @@ def assign_forward_overlaps(graph, k: int = K) -> int:
             link.overlap = overlap
             matched += 1
     return matched
+
+
+def colour_bubble_unitigs(graph, fastq_paths: list[Path], *, k: int = K, min_depth: int = 2) -> int:
+    """Paint only unitigs that sit in a simple bubble. Returns how many were painted."""
+    wanted: set[str] = set()
+    for bubble in detect_bubbles(graph):
+        wanted.add(bubble.source)
+        wanted.add(bubble.sink)
+        for branch in bubble.branches:
+            wanted.update(branch.path)
+    sequences = {unitig.unitig_id: unitig.sequence for unitig in graph.cdbg.unitigs if unitig.unitig_id in wanted}
+    index: dict[str, list[str]] = {}
+    for unitig_id, sequence in sequences.items():
+        if len(sequence) < k:
+            continue
+        for index_at in range(len(sequence) - k + 1):
+            index.setdefault(sequence[index_at : index_at + k], []).append(unitig_id)
+    hits: dict[str, Counter[str]] = {unitig_id: Counter() for unitig_id in sequences}
+    for path in fastq_paths:
+        lines = path.read_text(encoding="utf-8").splitlines()
+        for offset in range(0, len(lines), 4):
+            genome = genome_id(lines[offset][1:].split()[0])
+            sequence = lines[offset + 1].strip().upper()
+            seen: set[str] = set()
+            if len(sequence) < k:
+                continue
+            for index_at in range(len(sequence) - k + 1):
+                for unitig_id in index.get(sequence[index_at : index_at + k], ()):
+                    if unitig_id in seen:
+                        continue
+                    seen.add(unitig_id)
+                    hits[unitig_id][genome] += 1
+    genomes = sorted({genome for counts in hits.values() for genome in counts})
+    if not genomes:
+        raise SystemExit("no read k-mers hit bubble unitigs")
+    palette = {genome: colour_index for colour_index, genome in enumerate(genomes)}
+    graph.cdbg.colors = [
+        {"color_id": str(palette[genome]), "namespace": "genome", "value": genome} for genome in genomes
+    ]
+    by_id = {unitig.unitig_id: unitig for unitig in graph.cdbg.unitigs}
+    painted = 0
+    for unitig_id, counts in hits.items():
+        kept = [palette[genome] for genome, depth in counts.items() if depth >= min_depth]
+        if not kept:
+            continue
+        by_id[unitig_id].color_ids = sorted(kept)
+        painted += 1
+    for row in graph.cdbg.mapping:
+        if row.unitig_id in by_id and by_id[row.unitig_id].color_ids:
+            row.color_ids = list(by_id[row.unitig_id].color_ids)
+    graph.validate()
+    return painted
 
 
 def decision_counts(graph, name: str) -> dict[str, int]:
@@ -101,9 +153,10 @@ def main() -> int:
         graph = load_fastg(fastg, graph_id=name)
         matched = assign_forward_overlaps(graph)
         print("overlaps", matched, "links", len(graph.cdbg.links), flush=True)
-        print("colouring", name, flush=True)
-        graph = colour_from_fastq(graph, reads, k=K, min_depth=2)
-        row: dict = {"forward_overlaps": matched, "modes": {}}
+        print("colouring bubbles", name, flush=True)
+        painted = colour_bubble_unitigs(graph, reads)
+        print("painted", painted, flush=True)
+        row: dict = {"forward_overlaps": matched, "painted_unitigs": painted, "modes": {}}
         for debubbler in DEBUBBLERS:
             print("classifying", name, debubbler, flush=True)
             counts = decision_counts(graph, debubbler)

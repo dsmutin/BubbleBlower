@@ -33,6 +33,8 @@ training graph.
 
 `kmer_divergence` labels almost every remaining simple bubble as variation and keeps it. `heldout_genera` is the richest graph (525 bubbles). FASTG files are under `examples/half/work/megahit_k21/`. `half100half` has no MEGAHIT run.
 
+On `high100` only the unitigs inside simple bubbles were coloured (109 unitigs). `kmer_divergence` pops 2 and retains 98. `colour_topology` splits 2 and retains 98. Against the final contigs both win misassemblies (0 versus 2), mismatches (70.0 versus 103.6), and genome fraction (0.0020 versus 0.0006). Duplication rises with that extra coverage. N50 stays 126. Numbers are in `examples/half/data/megahit_k21_debubble_metrics.json`.
+
 Grouping bubble sequences by a shared (k-1)-prefix and (k-1)-suffix does
 not recover one bubble per removed sequence: almost every sequence is its
 own group. The FASTG, not that grouping, is the graph to debubble.
