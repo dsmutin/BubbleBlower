@@ -1,0 +1,42 @@
+{
+  "half_strains_k55": {
+    "metaspades_pop": {
+      "n50": 358.0,
+      "n_contigs": 19907.0,
+      "total_length": 7335270.0,
+      "genome_fraction": 0.1456954439306093,
+      "misassemblies": 18.0,
+      "mismatches_per_100kbp": 1017.4836483864012,
+      "duplication": 0.1461998349373651
+    },
+    "metaspades_keep": {
+      "n50": 358.0,
+      "n_contigs": 19947.0,
+      "total_length": 7336605.0,
+      "genome_fraction": 0.14565839000458375,
+      "misassemblies": 19.0,
+      "mismatches_per_100kbp": 1020.9620436633753,
+      "duplication": 0.14616862828611546
+    }
+  },
+  "close_k33": {
+    "metaspades_pop": {
+      "n50": 289.0,
+      "n_contigs": 7524.0,
+      "total_length": 2219818.0,
+      "genome_fraction": 0.12339308175619376,
+      "misassemblies": 9.0,
+      "mismatches_per_100kbp": 599.837109074443,
+      "duplication": 0.12358869237086603
+    },
+    "metaspades_keep": {
+      "n50": 287.0,
+      "n_contigs": 7733.0,
+      "total_length": 2232289.0,
+      "genome_fraction": 0.12283984874819641,
+      "misassemblies": 11.0,
+      "mismatches_per_100kbp": 606.6242988963271,
+      "duplication": 0.12303156384564903
+    }
+  }
+}

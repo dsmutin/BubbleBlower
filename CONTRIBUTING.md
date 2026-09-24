@@ -14,17 +14,16 @@ CLI (bubbleblower.cli)
 tests/          mandatory vs optional pytest
 examples/toy/   end-to-end run of the current (baseline) tool
 cite/           BibTeX for integrated third-party tools
-wiki/           contracts, test data, integrative testing
 agents/         portable rules and skills (any IDE)
 ```
 
-Replace baseline bodies with real implementations. Keep the documented return keys until you change the contract in `wiki/Contracts.md` and the tests together.
+The wiki is the [GitHub wiki](https://github.com/dsmutin/BubbleBlower/wiki), not a directory in this repository. Keep the documented return keys until you change the contract on the [Contracts](https://github.com/dsmutin/BubbleBlower/wiki/Contracts) page and the tests together.
 
 ## Testing architecture
 
 | Kind | Marker | Command | When |
 |------|--------|---------|------|
-| Required | `mandatory` | `pytest -m mandatory` | every commit; GitHub Action `required-tests` |
+| Required | `mandatory` | `pytest -m mandatory` | every commit; GitHub Action `required-tests` on every push and pull request |
 | Optional | `optional` | `pytest` (all) | release or workflow_dispatch; Action `full-tests` |
 | Examples | — | `python examples/toy/run.py` | full CI; after features that touch the CLI |
 | Vignettes | — | any `vignettes/` or extra `examples/*` | full CI when those files exist |
