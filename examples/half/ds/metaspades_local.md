@@ -9,4 +9,17 @@ These assemblies were already on disk. Bulge-on contigs are the metaSPAdes basel
 | close strains k33 | bulge on | 289 | 0.1234 | 9 | 599.8 | 0.1236 |
 | close strains k33 | bulge off | 287 | 0.1228 | 11 | 606.6 | 0.1230 |
 
-Leaving every bubble in the metaSPAdes graph does not cut misassemblies. It adds one on the ten-strain graph and two on the three-strain graph, and mismatches rise slightly. This is the opposite of the MEGAHIT k21 result, where later iterations create long two-genome contigs. A mode that keeps every branch is the wrong edit for these metaSPAdes graphs. The useful edit is to split a contig where the read colour changes, not to retain the bubble.
+Leaving every bubble in the metaSPAdes graph does not cut misassemblies. It adds one on the ten-strain graph and two on the three-strain graph, and mismatches rise slightly. This is the opposite of the MEGAHIT k21 result, where later iterations create long two-genome contigs. A mode that keeps every branch is the wrong edit for these metaSPAdes graphs.
+
+## Read-colour break
+
+`read_colour_break` splits a contig where the accession painted on its k-mers changes. N50 falls. Three of the four main scores improve against the metaSPAdes bulge-on contigs.
+
+| dataset | assembly | N50 | genome fraction | misassemblies | mismatches / 100 kbp | duplication |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| half_strains k55 | bulge on | 358 | 0.1457 | 18 | 1017.5 | 0.1462 |
+| half_strains k55 | colour break | 337 | 0.1375 | 6 | 977.3 | 0.1380 |
+| close strains k33 | bulge on | 289 | 0.1234 | 9 | 599.8 | 0.1236 |
+| close strains k33 | colour break of the unreduced walk | 244 | 0.1028 | 4 | 158.4 | 0.1029 |
+
+On `half_strains` the break is applied to the bulge-on contigs. On the close strains the break is applied to the walk of the unreduced graph, whose own mismatch rate was already 212.8 rather than 599.8. In both cases misassemblies, mismatches, and duplication improve, and genome fraction drops. Numbers are in `examples/half/data/colour_break_metrics.json`.

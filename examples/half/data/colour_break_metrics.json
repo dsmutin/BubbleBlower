@@ -1,0 +1,54 @@
+{
+  "close_k33": {
+    "baseline": {
+      "n50": 286.0,
+      "n_contigs": 7866.0,
+      "total_length": 2233708.0,
+      "genome_fraction": 0.12261683038737162,
+      "misassemblies": 9.0,
+      "mismatches_per_100kbp": 212.75245945468305,
+      "duplication": 0.12280840635920925
+    },
+    "read_colour_break": {
+      "n50": 244.0,
+      "n_contigs": 9912.0,
+      "total_length": 2241207.0,
+      "genome_fraction": 0.10279741265311296,
+      "misassemblies": 4.0,
+      "mismatches_per_100kbp": 158.39742887995988,
+      "duplication": 0.10294057291093497
+    },
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "duplication"
+    ],
+    "n_pieces": 9912
+  },
+  "half_strains_k55": {
+    "baseline": {
+      "n50": 358.0,
+      "n_contigs": 19907.0,
+      "total_length": 7335270.0,
+      "genome_fraction": 0.1456954439306093,
+      "misassemblies": 18.0,
+      "mismatches_per_100kbp": 1017.4836483864012,
+      "duplication": 0.1461998349373651
+    },
+    "read_colour_break": {
+      "n50": 337.0,
+      "n_contigs": 22701.0,
+      "total_length": 7342888.0,
+      "genome_fraction": 0.13753743632932156,
+      "misassemblies": 6.0,
+      "mismatches_per_100kbp": 977.2550057548352,
+      "duplication": 0.13799680755745858
+    },
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "duplication"
+    ],
+    "n_pieces": 22701
+  }
+}
