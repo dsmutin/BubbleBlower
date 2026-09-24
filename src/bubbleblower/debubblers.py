@@ -243,7 +243,9 @@ def compact_same_colour(graph: AssemblyGraph) -> AssemblyGraph:
     return current
 
 
-def resolve_debubbler(graph: AssemblyGraph, name: str, *, max_edits: int | None = None) -> AssemblyGraph:
+def resolve_debubbler(
+    graph: AssemblyGraph, name: str, *, max_edits: int | None = None, compact: bool = True
+) -> AssemblyGraph:
     """Return a new graph edited by the named debubbler. The input is copied.
 
     ``max_edits`` stops a cascade of new bubbles. The default allows a short
@@ -285,4 +287,6 @@ def resolve_debubbler(graph: AssemblyGraph, name: str, *, max_edits: int | None 
             skipped.add(bubble.bubble_id)
         if not acted:
             break
+    if not compact:
+        return current
     return compact_same_colour(current)

@@ -32,5 +32,6 @@ Contigs are walked with link orientation and scored against bulge-on contigs.
 | --- | ---: | --- | --- | ---: | ---: |
 | close strains k33 | 27 | 26 retain, 1 pop | 27 retain | 10 (bulge-on 9) | 213 (bulge-on 600) |
 | half_strains k55 | 10 | 8 retain, 2 pop | 10 retain | 19 (bulge-on 18) | 131 (bulge-on 1017) |
+| low75 k21,33 | 27 | 25 retain, 1 pop, 1 split | 27 retain | 0 (bulge-on 2) | 91 (bulge-on 502) |
 
-Both modes win mismatches and duplication. Both lose misassemblies and genome fraction. That is two of the four main scores. Popping the weak branch does not remove the chimeric unitigs. The read-colour break does. Numbers are in `examples/half/data/spades_debubble_metrics.json`.
+On the close-strain and ten-strain graphs both modes win mismatches and duplication and lose misassemblies and genome fraction. That is two of the four main scores. On `low75` both win misassemblies (0 versus 2), mismatches (91 versus 502), and duplication. Genome fraction is slightly lower (0.0145 versus 0.0146). That is three of the four main scores. N50 stays 245 versus 246. Numbers are in `examples/half/data/spades_debubble_metrics.json`.

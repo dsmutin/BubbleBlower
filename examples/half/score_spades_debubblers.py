@@ -64,7 +64,8 @@ def score_one(name: str, graph_path: Path, reads: list[Path], pop: Path, ref: Pa
         print("classifying", name, debubbler, flush=True)
         counts = decision_counts(graph, debubbler)
         print("decisions", debubbler, counts, flush=True)
-        resolved = resolve_debubbler(graph, debubbler)
+        n_edits = sum(count for key, count in counts.items() if not key.endswith(":retain"))
+        resolved = resolve_debubbler(graph, debubbler, max_edits=n_edits, compact=False)
         fasta = out_dir / f"{name}_{debubbler}.fasta"
         write_fasta(contig_sequences(resolved), fasta)
         print("scoring", name, debubbler, flush=True)
@@ -86,6 +87,15 @@ def main() -> int:
             [WORK / "close" / "R1.fastq", WORK / "close" / "R2.fastq"],
             WORK / "close" / "spades_pop" / "contigs.fasta",
             WORK / "close" / "references.fna",
+        ),
+        "low75": (
+            WORK / "bench" / "low75_keep" / "assembly_graph_after_simplification.gfa",
+            [
+                EX / "low75" / "work" / "iss" / "initial" / "sample_full_R1.fastq",
+                EX / "low75" / "work" / "iss" / "initial" / "sample_full_R2.fastq",
+            ],
+            WORK / "bench" / "low75_pop" / "contigs.fasta",
+            WORK / "megahit_k21" / "low75.references.fna",
         ),
         "half_strains_k55": (
             WORK / "metaspades_nobulge" / "assembly_graph_after_simplification.gfa",
