@@ -20,5 +20,6 @@ Scaffold checklist. Check a box only after mandatory tests pass.
 - [x] Skip badread junk reads that have no accession (VERSION 0.6.6)
 - [x] Read Flye dp:i: coverage from GFA (VERSION 0.6.7)
 - [x] Install MetaMetro editable so its VERSION file is on the import path (VERSION 0.6.8)
+- [x] Full CI runs the light toy, error, reads, and benchmark examples (VERSION 0.6.9)
 - [ ] Beat metaSPAdes, MEGAHIT k21 bubble removal, and metaFlye on the majority of main scores
 - [ ] Train debubblers on initial MEGAHIT graphs (k21 FASTG plus bubble_seq.fa) from half_strains, low75, low75half, high100, heldout_genera

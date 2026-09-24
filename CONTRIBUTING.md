@@ -25,8 +25,8 @@ The wiki is the [GitHub wiki](https://github.com/dsmutin/BubbleBlower/wiki), not
 |------|--------|---------|------|
 | Required | `mandatory` | `pytest -m mandatory` | every commit; GitHub Action `required-tests` on every push and pull request |
 | Optional | `optional` | `pytest` (all) | release or workflow_dispatch; Action `full-tests` |
-| Examples | — | `python examples/toy/run.py` | full CI; after features that touch the CLI |
-| Vignettes | — | any `vignettes/` or extra `examples/*` | full CI when those files exist |
+| Examples | — | `examples/toy`, `examples/error`, `examples/reads`, `examples/benchmark` | full CI; toy also after CLI changes |
+| Local only | — | `examples/half/run.py` | needs reads, a graph, and minimap2; not in CI |
 
 Do not mark a contract test `optional`. Optional tests are slow, extra, or nice-to-have.
 
