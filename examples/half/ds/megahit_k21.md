@@ -55,3 +55,7 @@ Scored with minimap2 `asm5`, alignments of at least 200 bp, against `work/sim/*.
 | high100 | final contigs | 428 | 0.0006 | 2 | 103.6 | 0.0006 |
 
 On all five finished sets the k21 contigs win misassemblies, mismatches, and genome fraction. Duplication is higher by about the same amount as the genome-fraction gain, so the extra alignment is new reference coverage rather than repeated mapping of the same bases. N50 is lower, as expected. That is three of the four main scores. `half100half` has no MEGAHIT output.
+
+## Where the final assembly adds misassemblies
+
+A misassembly here is one contig with two alignments of at least 200 bp on different reference records. On `half_strains` the final graph has 24 such contigs and k21 has 9. On `heldout_genera` the counts are 45 and 11. The extra final contigs are longer: the longest `half_strains` chimera is `k141_1194` at 1334 bp, and the longest `heldout_genera` chimera is `k141_299` at 2893 bp. The longest k21 chimeras in those two sets are 837 bp and 622 bp. Later k-mer iterations are joining sequences from two genomes into one contig. Keeping the k21 contigs avoids those joins. The two debubblers, run on the k21 FASTG, mostly retain the remaining simple bubbles (`heldout_genera`: 512 retain, 12 pop, 1 split), which is the same direction as keeping the k21 sequences.
