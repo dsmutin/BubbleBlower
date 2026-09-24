@@ -4,11 +4,13 @@
 ``colour_pop`` removes a branch only when its colours equal the other branch
 and its coverage is a small fraction of that branch.
 ``greedy`` is the global score search.
+``kmer_divergence`` and ``colour_topology`` are graph-only debubblers.
 """
 
 from __future__ import annotations
 
 from bubbleblower.classify import classify_bubble
+from bubbleblower.debubblers import resolve_debubbler
 from bubbleblower.detect import detect_bubbles
 from bubbleblower.edits import pop_branch
 from bubbleblower.features import extract_features
@@ -47,6 +49,8 @@ def resolve_mode(graph: AssemblyGraph, mode: str, **kwargs) -> AssemblyGraph:
             max_runtime_s=kwargs.get("max_runtime_s", 120.0),
             mode=kwargs.get("classifier", "coverage"),
         ).graph
+    if mode in {"kmer_divergence", "colour_topology"}:
+        return resolve_debubbler(graph, mode)
     raise ValueError(f"unknown mode: {mode}")
 
 
