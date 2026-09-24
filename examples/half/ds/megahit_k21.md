@@ -49,8 +49,11 @@ Only unitigs inside simple bubbles are coloured. Against the final contigs both 
 | low75half | final | — | 2 | 232.7 | 0.0180 |
 | low75half | kmer_divergence | 138 retain, 6 pop | 0 | 94.0 | 0.0333 |
 | low75half | colour_topology | 140 retain, 2 pop, 2 split | 0 | 93.9 | 0.0333 |
+| heldout_genera | final | — | 45 | 318.9 | 0.0276 |
+| heldout_genera | kmer_divergence | 512 retain, 12 pop, 1 split | 11 | 147.9 | 0.0456 |
+| heldout_genera | colour_topology | 524 retain, 1 split | 11 | 147.9 | 0.0456 |
 
-On `half_strains` the 14 pops and the 3 pops leave the same 9 misassemblies as the uncut k21 contigs. Those misassemblies are chimeric unitigs, not the simple bubbles these modes edit. Numbers are in `examples/half/data/megahit_k21_debubble_metrics.json`.
+On `half_strains` the pops leave the same 9 misassemblies as the uncut k21 contigs. On `heldout_genera` the 12 pops and the one split leave the same 11. Those misassemblies are chimeric unitigs, not the simple bubbles these modes edit. Numbers are in `examples/half/data/megahit_k21_debubble_metrics.json`.
 
 Grouping bubble sequences by a shared (k-1)-prefix and (k-1)-suffix does
 not recover one bubble per removed sequence: almost every sequence is its
