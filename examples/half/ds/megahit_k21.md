@@ -33,7 +33,18 @@ training graph.
 
 `kmer_divergence` labels almost every remaining simple bubble as variation and keeps it. `heldout_genera` is the richest graph (525 bubbles). FASTG files are under `examples/half/work/megahit_k21/`. `half100half` has no MEGAHIT run.
 
-On `high100` only the unitigs inside simple bubbles were coloured (109 unitigs). `kmer_divergence` pops 2 and retains 98. `colour_topology` splits 2 and retains 98. Against the final contigs both win misassemblies (0 versus 2), mismatches (70.0 versus 103.6), and genome fraction (0.0020 versus 0.0006). Duplication rises with that extra coverage. N50 stays 126. Numbers are in `examples/half/data/megahit_k21_debubble_metrics.json`.
+Only unitigs inside simple bubbles are coloured. Against the final contigs both debubblers win misassemblies, mismatches, and genome fraction. Duplication rises with the extra k21 coverage. N50 stays at the k21 length.
+
+| dataset | mode | decisions | misassemblies | mismatches / 100 kbp | genome fraction |
+| --- | --- | --- | ---: | ---: | ---: |
+| high100 | final | — | 2 | 103.6 | 0.0006 |
+| high100 | kmer_divergence | 98 retain, 2 pop | 0 | 70.0 | 0.0020 |
+| high100 | colour_topology | 98 retain, 2 split | 0 | 70.0 | 0.0020 |
+| half_strains | final | — | 24 | 202.8 | 0.0990 |
+| half_strains | kmer_divergence | 370 retain, 14 pop | 9 | 116.8 | 0.1312 |
+| half_strains | colour_topology | 381 retain, 3 pop | 9 | 116.8 | 0.1312 |
+
+On `half_strains` the 14 pops and the 3 pops leave the same 9 misassemblies as the uncut k21 contigs. Those misassemblies are chimeric unitigs, not the simple bubbles these modes edit. Numbers are in `examples/half/data/megahit_k21_debubble_metrics.json`.
 
 Grouping bubble sequences by a shared (k-1)-prefix and (k-1)-suffix does
 not recover one bubble per removed sequence: almost every sequence is its
