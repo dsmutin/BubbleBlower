@@ -66,7 +66,11 @@ def main() -> int:
         payload[name] = score_dataset(name)
         print(json.dumps({name: payload[name]}, indent=2), flush=True)
     dest = out / "megahit_k21_metrics.json"
-    dest.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    existing: dict = {}
+    if dest.is_file():
+        existing = json.loads(dest.read_text(encoding="utf-8"))
+    existing.update(payload)
+    dest.write_text(json.dumps(existing, indent=2) + "\n", encoding="utf-8")
     return 0
 
 

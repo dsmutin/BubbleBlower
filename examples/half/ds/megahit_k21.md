@@ -47,5 +47,9 @@ Scored with minimap2 `asm5`, alignments of at least 200 bp, against `work/sim/*.
 | half_strains | final contigs | 460 | 0.0990 | 24 | 202.8 | 0.0993 |
 | low75 | k21 contigs | 126 | 0.0139 | 0 | 82.6 | 0.0140 |
 | low75 | final contigs | 465 | 0.0066 | 1 | 139.2 | 0.0066 |
+| low75half | k21 contigs | 126 | 0.0333 | 0 | 94.0 | 0.0334 |
+| low75half | final contigs | 429 | 0.0180 | 2 | 232.7 | 0.0182 |
+| heldout_genera | k21 contigs | 126 | 0.0456 | 11 | 148.0 | 0.0457 |
+| heldout_genera | final contigs | 390 | 0.0276 | 45 | 318.9 | 0.0276 |
 
-On both sets the k21 contigs win misassemblies, mismatches, and genome fraction. Duplication is higher because more of the reference is covered, not because the same bases are aligned many times (duplication and genome fraction differ only in the fourth digit). N50 is lower, as expected. That is three of the four main scores. `low75half`, `heldout_genera`, and `high100` are scored by `examples/half/score_megahit_k21.py`.
+On all four finished sets the k21 contigs win misassemblies, mismatches, and genome fraction. Duplication is higher by about the same amount as the genome-fraction gain, so the extra alignment is new reference coverage rather than repeated mapping of the same bases. N50 is lower, as expected. That is three of the four main scores. `high100` is still running in `examples/half/score_megahit_k21.py`. `half100half` has no MEGAHIT output.
