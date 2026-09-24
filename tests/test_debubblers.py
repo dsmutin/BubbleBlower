@@ -130,11 +130,16 @@ def test_adjacent_same_colour_nodes_merge() -> None:
     for link in graph.cdbg.links:
         link.overlap = 0
     merged, edit = merge_adjacent(graph, "eAB")
+    assert {unitig.unitig_id for unitig in graph.cdbg.unitigs} == {"A", "B", "C"}
     assert len(merged.cdbg.unitigs) == 2
     sequences = {unitig.sequence for unitig in merged.cdbg.unitigs}
     assert "ACGTACGTTTGGTTGG" in sequences
     restored = revert(merged, edit)
     assert {unitig.unitig_id for unitig in restored.cdbg.unitigs} == {"A", "B", "C"}
+    scratch = graph.copy()
+    inplace, _inplace_edit = merge_adjacent(scratch, "eAB", copy_graph=False)
+    assert inplace is scratch
+    assert any(unitig.sequence == "ACGTACGTTTGGTTGG" for unitig in inplace.cdbg.unitigs)
     compacted = compact_same_colour(graph)
     assert any(unitig.sequence == "ACGTACGTTTGGTTGG" for unitig in compacted.cdbg.unitigs)
     assert any(unitig.sequence == "GGCCAAGG" for unitig in compacted.cdbg.unitigs)

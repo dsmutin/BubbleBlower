@@ -238,7 +238,7 @@ def compact_same_colour(graph: AssemblyGraph) -> AssemblyGraph:
                 break
         if chosen is None:
             break
-        current, _edit = merge_adjacent(current, chosen)
+        current, _edit = merge_adjacent(current, chosen, copy_graph=False)
     return current
 
 

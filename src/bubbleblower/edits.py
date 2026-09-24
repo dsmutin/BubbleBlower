@@ -220,14 +220,17 @@ def merge_instances(graph: AssemblyGraph, instance_ids: list[str], target_id: st
     return updated, edit
 
 
-def merge_adjacent(graph: AssemblyGraph, link_id: str) -> tuple[AssemblyGraph, Edit]:
+def merge_adjacent(
+    graph: AssemblyGraph, link_id: str, *, copy_graph: bool = True
+) -> tuple[AssemblyGraph, Edit]:
     """Collapse one link into a single unitig.
 
     The source must have only this outgoing link and the target only this
     incoming link. Colours must be equal and non-empty. The stored overlap is
-    consumed. A missing overlap is refused.
+    consumed. A missing overlap is refused. ``copy_graph`` is false when the
+    caller already holds the only copy and can accept an in-place edit.
     """
-    updated = graph.copy()
+    updated = graph.copy() if copy_graph else graph
     link = updated.link(link_id)
     if link.overlap is None:
         raise ValueError(f"link {link_id} has no overlap")

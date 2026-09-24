@@ -12,5 +12,6 @@ Scaffold checklist. Check a box only after mandatory tests pass.
 - [x] Close-strain metaSPAdes graph coloured and scored (VERSION 0.4.0)
 - [x] Graph-only debubblers kmer_divergence and colour_topology (VERSION 0.5.0)
 - [x] Adjacent same-colour merge, inverse of a linear split (VERSION 0.6.0)
+- [x] In-place adjacent merge so compaction can run on a large graph (VERSION 0.6.1)
 - [ ] Beat metaSPAdes, MEGAHIT k21 bubble removal, and metaFlye on the majority of main scores
 - [ ] Train debubblers on initial MEGAHIT graphs (k21 FASTG plus bubble_seq.fa) from half_strains, low75, low75half, high100, heldout_genera
