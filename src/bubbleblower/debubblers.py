@@ -249,7 +249,10 @@ def resolve_debubbler(graph: AssemblyGraph, name: str) -> AssemblyGraph:
         raise ValueError(f"unknown debubbler: {name}")
     current = graph.copy()
     skipped: set[str] = set()
-    for _ in range(max(8, len(current.cdbg.unitigs) * 4)):
+    # One pass per original bubble, with room for a short cascade. A cap on
+    # unitig count re-splits the same signature for hours on a MEGAHIT graph.
+    limit = max(8, len(detect_bubbles(current)) * 3)
+    for _ in range(limit):
         acted = False
         for bubble in detect_bubbles(current):
             if bubble.bubble_id in skipped:
@@ -269,6 +272,7 @@ def resolve_debubbler(graph: AssemblyGraph, name: str) -> AssemblyGraph:
                     skipped.add(bubble.bubble_id)
                     continue
                 current = edited
+                skipped.add(bubble.bubble_id)
                 acted = True
                 break
             skipped.add(bubble.bubble_id)

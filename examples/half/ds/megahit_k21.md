@@ -43,6 +43,12 @@ Only unitigs inside simple bubbles are coloured. Against the final contigs both 
 | half_strains | final | — | 24 | 202.8 | 0.0990 |
 | half_strains | kmer_divergence | 370 retain, 14 pop | 9 | 116.8 | 0.1312 |
 | half_strains | colour_topology | 381 retain, 3 pop | 9 | 116.8 | 0.1312 |
+| low75 | final | — | 1 | 139.2 | 0.0066 |
+| low75 | kmer_divergence | 134 retain, 1 pop | 0 | 82.6 | 0.0139 |
+| low75 | colour_topology | 131 retain, 3 pop, 1 split | 0 | 82.6 | 0.0139 |
+| low75half | final | — | 2 | 232.7 | 0.0180 |
+| low75half | kmer_divergence | 138 retain, 6 pop | 0 | 94.0 | 0.0333 |
+| low75half | colour_topology | 140 retain, 2 pop, 2 split | 0 | 93.9 | 0.0333 |
 
 On `half_strains` the 14 pops and the 3 pops leave the same 9 misassemblies as the uncut k21 contigs. Those misassemblies are chimeric unitigs, not the simple bubbles these modes edit. Numbers are in `examples/half/data/megahit_k21_debubble_metrics.json`.
 

@@ -14,5 +14,6 @@ Scaffold checklist. Check a box only after mandatory tests pass.
 - [x] Adjacent same-colour merge, inverse of a linear split (VERSION 0.6.0)
 - [x] In-place adjacent merge so compaction can run on a large graph (VERSION 0.6.1)
 - [x] Orientation-aware contig walk (VERSION 0.6.2)
+- [x] Do not re-split the same bubble signature (VERSION 0.6.3)
 - [ ] Beat metaSPAdes, MEGAHIT k21 bubble removal, and metaFlye on the majority of main scores
 - [ ] Train debubblers on initial MEGAHIT graphs (k21 FASTG plus bubble_seq.fa) from half_strains, low75, low75half, high100, heldout_genera
