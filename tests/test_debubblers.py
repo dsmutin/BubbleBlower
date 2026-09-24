@@ -109,6 +109,43 @@ def test_read_colour_break_splits_a_chimera(tmp_path) -> None:
     assert plain == [left + "T" * 8]
 
 
+def test_read_colour_break_reads_badread_accession(tmp_path) -> None:
+    """Badread puts the genome after the read uuid, not in the first token."""
+    left = "A" * 24
+    right = "C" * 24
+    fastq = tmp_path / "ont.fastq"
+    lines = []
+    for index in range(3):
+        lines.extend(
+            [
+                f"@uuid-{index} GCF_000000001|0,+strand,1-40 length=40",
+                left + "T" * 8,
+                "+",
+                "I" * 32,
+            ]
+        )
+        lines.extend(
+            [
+                f"@uuid-{index}b GCF_000000002|0,+strand,1-40 length=40",
+                "G" * 8 + right,
+                "+",
+                "I" * 32,
+            ]
+        )
+    fastq.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    broken = break_read_colour_chimeras(
+        [("chimera", left + right)],
+        [fastq],
+        k=8,
+        min_run=4,
+        min_piece=10,
+    )
+    pieces = [sequence for _name, sequence in broken]
+    assert len(pieces) >= 2
+    assert any(set(piece) == {"A"} for piece in pieces)
+    assert any(set(piece) == {"C"} for piece in pieces)
+
+
 def test_adjacent_same_colour_nodes_merge() -> None:
     """A simple same-colour path collapses. Different colours stay apart."""
     graph = build_graph(

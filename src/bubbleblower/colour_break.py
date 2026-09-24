@@ -13,7 +13,13 @@ from pathlib import Path
 
 
 def _genome_id(read_id: str) -> str:
-    token = read_id.split("_", 2)
+    """Return ``GCF_########`` or ``GCA_########`` from an ISS or badread header."""
+    for token in read_id.replace("|", " ").replace(",", " ").split():
+        if token.startswith(("GCF_", "GCA_")):
+            parts = token.split("_")
+            if len(parts) >= 2 and parts[1]:
+                return f"{parts[0]}_{parts[1]}"
+    token = read_id.split()[0].split("_", 2)
     if len(token) < 2:
         raise ValueError(f"read id has no accession: {read_id}")
     return f"{token[0]}_{token[1]}"
@@ -30,7 +36,7 @@ def _read_kmer_counts(fastq_paths: list[Path], needed: set[str], k: int) -> dict
     for path in fastq_paths:
         lines = path.read_text(encoding="utf-8").splitlines()
         for offset in range(0, len(lines), 4):
-            genome = _genome_id(lines[offset][1:].split()[0])
+            genome = _genome_id(lines[offset][1:])
             sequence = lines[offset + 1].strip().upper()
             seen: set[str] = set()
             if len(sequence) < k:
