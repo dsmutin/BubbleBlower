@@ -59,3 +59,14 @@ On all five finished sets the k21 contigs win misassemblies, mismatches, and gen
 ## Where the final assembly adds misassemblies
 
 A misassembly here is one contig with two alignments of at least 200 bp on different reference records. On `half_strains` the final graph has 24 such contigs and k21 has 9. On `heldout_genera` the counts are 45 and 11. The extra final contigs are longer: the longest `half_strains` chimera is `k141_1194` at 1334 bp, and the longest `heldout_genera` chimera is `k141_299` at 2893 bp. The longest k21 chimeras in those two sets are 837 bp and 622 bp. Later k-mer iterations are joining sequences from two genomes into one contig. Keeping the k21 contigs avoids those joins. The two debubblers, run on the k21 FASTG, mostly retain the remaining simple bubbles (`heldout_genera`: 512 retain, 12 pop, 1 split), which is the same direction as keeping the k21 sequences.
+
+## Colour break on the final contigs
+
+`read_colour_break` applied to the final FASTA, using the example's own Illumina reads, cuts the long two-genome contigs without going back to k21. It wins misassemblies, mismatches, and duplication. Genome fraction falls. N50 falls a little.
+
+| dataset | assembly | N50 | genome fraction | misassemblies | mismatches / 100 kbp | duplication |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| half_strains | final | 460 | 0.0990 | 24 | 202.8 | 0.0993 |
+| half_strains | colour break | 436 | 0.0924 | 9 | 167.7 | 0.0927 |
+| heldout_genera | final | 390 | 0.0276 | 45 | 318.9 | 0.0276 |
+| heldout_genera | colour break | 343 | 0.0220 | 12 | 193.2 | 0.0220 |
