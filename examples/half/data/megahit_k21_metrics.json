@@ -1,0 +1,22 @@
+{
+  "half_strains": {
+    "megahit_k21": {
+      "n50": 187.0,
+      "n_contigs": 93070.0,
+      "total_length": 14234781.0,
+      "genome_fraction": 0.13115447915230447,
+      "misassemblies": 9.0,
+      "mismatches_per_100kbp": 116.84855361679116,
+      "duplication": 0.13159459250808173
+    },
+    "megahit_final": {
+      "n50": 460.0,
+      "n_contigs": 10071.0,
+      "total_length": 4770815.0,
+      "genome_fraction": 0.09899709492135374,
+      "misassemblies": 24.0,
+      "mismatches_per_100kbp": 202.75539936006794,
+      "duplication": 0.09928577233474647
+    }
+  }
+}

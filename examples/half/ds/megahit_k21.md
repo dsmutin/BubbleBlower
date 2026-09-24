@@ -36,3 +36,16 @@ training graph.
 Grouping bubble sequences by a shared (k-1)-prefix and (k-1)-suffix does
 not recover one bubble per removed sequence: almost every sequence is its
 own group. The FASTG, not that grouping, is the graph to debubble.
+
+## k21 contigs versus MEGAHIT final contigs
+
+Scored with minimap2 `asm5`, alignments of at least 200 bp, against `work/sim/*.fna`. Lower is better for misassemblies, mismatches per 100 kbp, and duplication. Higher is better for genome fraction. N50 is secondary and is expected to fall.
+
+| dataset | assembly | N50 | genome fraction | misassemblies | mismatches / 100 kbp | duplication |
+| --- | --- | ---: | ---: | ---: | ---: | ---: |
+| half_strains | k21 contigs | 187 | 0.1312 | 9 | 116.8 | 0.1316 |
+| half_strains | final contigs | 460 | 0.0990 | 24 | 202.8 | 0.0993 |
+| low75 | k21 contigs | 126 | 0.0139 | 0 | 82.6 | 0.0140 |
+| low75 | final contigs | 465 | 0.0066 | 1 | 139.2 | 0.0066 |
+
+On both sets the k21 contigs win misassemblies, mismatches, and genome fraction. Duplication is higher because more of the reference is covered, not because the same bases are aligned many times (duplication and genome fraction differ only in the fourth digit). N50 is lower, as expected. That is three of the four main scores. `low75half`, `heldout_genera`, and `high100` are scored by `examples/half/score_megahit_k21.py`.
