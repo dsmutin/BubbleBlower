@@ -1,10 +1,28 @@
 {
-  "precision_error": 1.0,
-  "recall_error": 0.92,
-  "f1_error": 0.9583333333333334,
-  "auroc_error": 0.9952,
-  "tp": 23.0,
-  "fp": 0.0,
-  "fn": 2.0,
-  "tn": 25.0
+  "amber_f1": 0.9583333333333334,
+  "classification": {
+    "amber_f1": 0.9583333333333334,
+    "precision_error": 1.0,
+    "recall_error": 0.92,
+    "f1_error": 0.9583333333333334,
+    "precision_strain": 0.9259259259259259,
+    "recall_strain": 1.0,
+    "f1_strain": 0.9615384615384615,
+    "auroc_error": 0.9952,
+    "auprc_error": 0.9957142857142857,
+    "tp": 23.0,
+    "fp": 0.0,
+    "fn": 2.0,
+    "tn": 25.0
+  },
+  "resolution": {
+    "amber_f1": 0.9583333333333334,
+    "precision": 1.0,
+    "recall": 0.92,
+    "true_pops": 23.0,
+    "false_pops": 0.0,
+    "missed_errors": 2.0,
+    "retained_strains": 25.0,
+    "delta_score": 34.005757784542574
+  }
 }

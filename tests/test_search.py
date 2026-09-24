@@ -24,6 +24,10 @@ def test_beam_and_mcmc_do_not_lose_score() -> None:
     assert chain.scores[-1].total >= chain.scores[0].total - 1e-6
     assert greedy.edits
     assert greedy.edits[0].edit_type == "pop"
+    assert greedy.edits[0].bubble_id
+    assert beam.scores[-1].total > beam.scores[0].total
+    assert all(unitig.unitig_id != "E" for unitig in beam.graph.cdbg.unitigs)
+    assert all(unitig.unitig_id != "E" for unitig in greedy.graph.cdbg.unitigs)
 
 
 def test_result_tables_round_trip_coverage(tmp_path: Path) -> None:
@@ -36,3 +40,10 @@ def test_result_tables_round_trip_coverage(tmp_path: Path) -> None:
     assert loaded.node_coverage.keys() == result.graph.node_coverage.keys()
     for unitig_id, coverage in result.graph.node_coverage.items():
         assert loaded.node_coverage[unitig_id] == pytest.approx(coverage)
+    header, *rows = (tmp_path / "bubble_results.tsv").read_text(encoding="utf-8").splitlines()
+    columns = header.split("\t")
+    assert "selected_edit" in columns
+    edit_col = columns.index("selected_edit")
+    assert any(row.split("\t")[edit_col] == "pop" for row in rows)
+    history_header = (tmp_path / "edit_history.tsv").read_text(encoding="utf-8").splitlines()[1].split("\t")
+    assert history_header[1] != history_header[2] or history_header[9] == "no"

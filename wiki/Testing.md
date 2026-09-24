@@ -5,7 +5,7 @@
 | Path | Role |
 |------|------|
 | `examples/toy/data/` | strain-bubble JSON from `run.py` |
-| `examples/benchmark/data/` | 50-bubble ground truth and classifier metrics |
+| `examples/benchmark/data/` | 50-bubble ground truth; AMBER F1 for classify and resolve |
 | `examples/error/data/` | resolved error bubble, score rises, branch `E` removed |
 | `examples/reads/data/` | MetaMetro reads, coloured CFA, bubble count |
 | `tests/` | contract tests; graphs are built in code |

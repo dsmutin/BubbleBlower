@@ -30,6 +30,7 @@ class AssemblyGraph:
     node_coverage: dict[str, float] = field(default_factory=dict)
     link_coverage: dict[str, float] = field(default_factory=dict)
     lineage: dict[str, dict[str, str | None]] = field(default_factory=dict)
+    coverage_source: str = "caller"
     _seq: int = 0
 
     def copy(self) -> AssemblyGraph:
@@ -123,6 +124,12 @@ def from_cdbg(
             if parsed is not None:
                 graph.link_coverage[link.link_id] = parsed
     graph._seq = len(graph.cdbg.unitigs) + len(graph.cdbg.links) + len(graph.cdbg.mapping)
+    if supplied_nodes:
+        graph.coverage_source = "caller"
+    elif any(unitig.unitig_id in graph.node_coverage for unitig in graph.cdbg.unitigs):
+        graph.coverage_source = "unitig_name_cov_token"
+    else:
+        graph.coverage_source = "absent"
     return graph
 
 

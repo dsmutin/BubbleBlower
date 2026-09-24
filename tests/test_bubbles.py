@@ -7,7 +7,7 @@ import pytest
 from bubbleblower.classify import classify_bubble
 from bubbleblower.detect import detect_bubbles
 from bubbleblower.edits import duplicate_instance, merge_instances, pop_branch, revert, split_instance
-from bubbleblower.evaluate import classification_metrics
+from bubbleblower.evaluate import classification_metrics, resolution_metrics
 from bubbleblower.features import extract_features
 from bubbleblower.fixtures import error_bubble, nested_bubbles, shared_duplicate_node, strain_bubble
 from bubbleblower.generate import generate_bubble_benchmark
@@ -85,7 +85,17 @@ def test_fifty_bubble_classifier() -> None:
         rows.append((row["type"], classify_bubble(extract_features(graph, bubble))))
     metrics = classification_metrics(rows)
     assert metrics["auroc_error"] >= 0.9
-    assert metrics["f1_error"] >= 0.75
+    assert metrics["amber_f1"] >= 0.85
+    resolved = greedy_search(graph, max_iterations=60, patience=1, max_runtime_s=60.0)
+    resolution = resolution_metrics(
+        resolved.graph,
+        truth,
+        score_before=resolved.scores[0],
+        score_after=resolved.scores[-1],
+    )
+    assert resolution["false_pops"] == 0
+    assert resolution["amber_f1"] >= 0.85
+    assert resolution["delta_score"] > 0
 
 
 def test_rare_strain_needs_more_than_coverage() -> None:

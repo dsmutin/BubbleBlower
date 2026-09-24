@@ -21,5 +21,7 @@ Scaffold contracts from `/start-dev`. Add tool-specific rows when the product sp
 | Beam search and MCMC | `bubbleblower.search.beam_search`, `mcmc_search` |
 | Output tables and resolved CDBG | `bubbleblower.report.write_result` |
 | Read-level graph via MetaMetro | `examples/reads/run.py` |
+| AMBER F1 (primary quality metric) | `bubbleblower.evaluate.amber_f1` |
+| Colour-aware global score | `bubbleblower.score.score_graph` |
 | English docs on public APIs | baseline (module/function docstrings) |
 | No `git push` unless the human asks | baseline (rule `no-push`) |

@@ -86,6 +86,11 @@ def nested_bubbles() -> AssemblyGraph:
     )
 
 
+mock_bubble_strain = strain_bubble
+mock_bubble_error = error_bubble
+mock_bubble_nested = nested_bubbles
+
+
 def shared_duplicate_node() -> AssemblyGraph:
     """One shared sequence instance sitting on two coloured paths."""
     return build_graph(
@@ -101,3 +106,7 @@ def shared_duplicate_node() -> AssemblyGraph:
             {"id": "eXT", "source": "X", "target": "T", "colors": [0, 1], "coverage": 100.0},
         ],
     )
+
+
+mock_bubble_shared = shared_duplicate_node
+mock_bubble_duplicate = shared_duplicate_node

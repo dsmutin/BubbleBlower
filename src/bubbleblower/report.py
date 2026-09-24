@@ -37,17 +37,24 @@ def write_result(result: SearchResult, directory: str | Path) -> None:
             for link_id, coverage in sorted(result.graph.link_coverage.items())
         ],
     )
+    edits_by_bubble: dict[str, list[tuple[int, str]]] = {}
+    for step in result.steps:
+        if not step.accepted or step.edit is None or not step.edit.bubble_id:
+            continue
+        edits_by_bubble.setdefault(step.edit.bubble_id, []).append((step.iteration, step.edit.edit_type))
     bubble_rows = []
-    for index, posterior in enumerate(result.posteriors):
-        edit = result.edits[0].edit_type if result.edits else ""
+    for posterior in result.posteriors:
+        chosen = edits_by_bubble.get(posterior.bubble_id, [])
+        iteration = str(chosen[-1][0]) if chosen else "0"
+        selected = chosen[-1][1] if chosen else ""
         bubble_rows.append(
             [
                 posterior.bubble_id,
-                "0",
+                iteration,
                 f"{posterior.p_error:.6g}",
                 f"{posterior.p_strain:.6g}",
                 posterior.decision,
-                edit if index == 0 else "",
+                selected,
                 f"{posterior.confidence:.6g}",
             ]
         )
@@ -57,13 +64,13 @@ def write_result(result: SearchResult, directory: str | Path) -> None:
         bubble_rows,
     )
     history = []
-    for step_index, step in enumerate(result.steps):
+    for step in result.steps:
         edit = step.edit
         history.append(
             [
                 str(step.iteration),
-                str(step_index + 1),
-                str(step_index),
+                str(step.state_id),
+                str(step.parent_state),
                 "" if edit is None else edit.edit_id,
                 "" if edit is None else edit.edit_type,
                 "" if edit is None else ",".join(edit.source_ids),
@@ -91,10 +98,12 @@ def write_result(result: SearchResult, directory: str | Path) -> None:
     )
     score_rows = []
     for index, score in enumerate(result.scores):
+        step = result.steps[index - 1] if index and index - 1 < len(result.steps) else None
+        state_id = 0 if step is None else step.state_id
         score_rows.append(
             [
                 str(index),
-                str(index),
+                str(state_id),
                 f"{score.total:.6g}",
                 f"{score.coverage:.6g}",
                 f"{score.flow:.6g}",

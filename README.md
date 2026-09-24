@@ -33,7 +33,10 @@ python examples/reads/run.py
 
 `bubbleblower` classifies the built-in two-taxon strain bubble and prints JSON.
 Pass `-o` to write that JSON to a file. A CDBG directory can be passed later through `bubbleblower.pipeline.load_assembly`.
-The benchmark writes `examples/benchmark/data/` and checks error-class F1 on 50 synthetic bubbles (25 strain, 25 sequencing error, 3 strains).
+The benchmark writes `examples/benchmark/data/` and gates on **AMBER F1**
+(harmonic mean of pop purity and error-removal completeness) for both
+classification and greedy resolution. The graph has 50 bubbles (25 strain,
+25 sequencing error, 3 strains). False pops of strain branches fail the run.
 
 ## Tests
 

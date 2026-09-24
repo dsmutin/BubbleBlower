@@ -1,0 +1,6 @@
+schema_version: '1.0'
+graph_id: benchmark-42
+graph_type: repeat
+contract: bubbleblower
+contract_version: '1.0'
+compaction: identity

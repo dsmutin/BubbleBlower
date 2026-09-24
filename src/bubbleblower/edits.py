@@ -25,6 +25,7 @@ class Edit:
     target_ids: tuple[str, ...]
     reason: str
     payload: dict = field(default_factory=dict)
+    bubble_id: str | None = None
 
 
 def _remember(graph: AssemblyGraph, edit_type: str) -> str:
@@ -104,6 +105,7 @@ def pop_branch(graph: AssemblyGraph, bubble: Bubble, branch_index: int) -> tuple
         target_ids=(),
         reason=f"pop branch {branch_index} of {bubble.bubble_id}",
         payload=payload,
+        bubble_id=bubble.bubble_id,
     )
     updated.validate()
     return updated, edit
@@ -316,8 +318,6 @@ def split_instance(graph: AssemblyGraph, instance_id: str, groups: list[list[str
             if clone.target == instance_id:
                 clone.target = new_id
             updated.link_coverage[clone_id] = total * weights[index] / weight_total
-        if link_id not in {link.link_id for link in updated.cdbg.links}:
-            pass
     _drop_unitig(updated, instance_id)
     edit = Edit(
         edit_id=_remember(updated, "split"),

@@ -5,6 +5,7 @@ Ground truth is written beside the graph and is not read by the resolver.
 
 from __future__ import annotations
 
+import math
 import random
 from pathlib import Path
 
@@ -14,7 +15,7 @@ from bubbleblower.graph import AssemblyGraph, build_graph
 def _poisson(rng: random.Random, lam: float) -> int:
     if lam <= 0:
         return 0
-    limit = math_exp(-lam)
+    limit = math.exp(-lam)
     count = 0
     product = 1.0
     while product > limit:
@@ -23,10 +24,15 @@ def _poisson(rng: random.Random, lam: float) -> int:
     return count - 1
 
 
-def math_exp(value: float) -> float:
-    import math
-
-    return math.exp(value)
+def _tag(index: int) -> str:
+    """Encode ``index`` as a short unique ACGT word so bubble signatures differ."""
+    alphabet = "ACGT"
+    digits: list[str] = []
+    value = index + 1
+    while value:
+        digits.append(alphabet[value % 4])
+        value //= 4
+    return "".join(digits) or "A"
 
 
 def _band(rng: random.Random, kind: str) -> float:
@@ -60,7 +66,7 @@ def generate_bubble_benchmark(
         raise ValueError("abundance must cover every strain")
     rng = random.Random(seed)
     n_bio = n_bubbles - n_error_bubbles
-    plan: list[tuple[str, tuple[int, ...]]] = []
+    plan: list[tuple[str, tuple]] = []
     pairs = [(0, 1), (1, 2), (0, 2)]
     for index in range(min(10, n_bio)):
         plan.append(("strain", pairs[index % len(pairs)]))
@@ -74,7 +80,7 @@ def generate_bubble_benchmark(
     error_kinds = (["very_low"] * 10) + (["medium"] * 8) + (["borderline"] * 5) + (["hard"] * 2)
     for index in range(n_error_bubbles):
         kind = error_kinds[index] if index < len(error_kinds) else "medium"
-        plan.append(("error", (index % n_strains, kind)))  # type: ignore[arg-type]
+        plan.append(("error", (index % n_strains, kind)))
     nodes: list[dict] = []
     links: list[dict] = []
     truth: list[dict[str, str]] = []
@@ -83,14 +89,14 @@ def generate_bubble_benchmark(
         source = f"{bubble_id}S"
         sink = f"{bubble_id}T"
         if kind == "strain":
-            strains = tuple(spec)  # type: ignore[arg-type]
+            strains = tuple(int(item) for item in spec)
             coverages = [float(_poisson(rng, abundance[strain])) for strain in strains]
             coverages = [max(value, 1.0) for value in coverages]
             expected = "retain"
             strain_names = [f"strain_{chr(ord('A') + strain)}" for strain in strains]
         else:
-            owner = int(spec[0])  # type: ignore[index]
-            band = str(spec[1])  # type: ignore[index]
+            owner = int(spec[0])
+            band = str(spec[1])
             true_cov = float(max(_poisson(rng, abundance[owner]), 1))
             error_cov = max(_band(rng, band), error_rate * true_cov)
             strains = (owner, owner)
@@ -98,10 +104,11 @@ def generate_bubble_benchmark(
             expected = "pop"
             strain_names = [f"strain_{chr(ord('A') + owner)}"]
         source_cov = sum(coverages)
+        tag = _tag(index)
         nodes.append(
             {
                 "id": source,
-                "sequence": f"ACGT{'AC' * (index % 5)}TT",
+                "sequence": f"ACGT{'AC' * (index % 5)}TT{tag}",
                 "colors": sorted({int(item) for item in strains}),
                 "coverage": source_cov,
             }
@@ -109,7 +116,7 @@ def generate_bubble_benchmark(
         nodes.append(
             {
                 "id": sink,
-                "sequence": f"GGCC{'GG' * (index % 4)}AA",
+                "sequence": f"GGCC{'GG' * (index % 4)}AA{tag}",
                 "colors": sorted({int(item) for item in strains}),
                 "coverage": source_cov,
             }
@@ -118,7 +125,7 @@ def generate_bubble_benchmark(
         for branch_index, (strain, coverage) in enumerate(zip(strains, coverages)):
             branch_id = f"{bubble_id}{chr(ord('A') + branch_index)}"
             branch_ids.append(branch_id)
-            base = "ATGC" if kind == "strain" else "NNNN".replace("N", "ACGT"[branch_index % 4])
+            base = "ATGC" if kind == "strain" else "ACGT"[branch_index % 4] * 4
             sequence = (base * 4)[: 8 + branch_index] + f"{index:02d}"[-2:]
             sequence = "".join(ch if ch in "ACGT" else "A" for ch in sequence)
             if len(sequence) < 6:
@@ -126,7 +133,7 @@ def generate_bubble_benchmark(
             nodes.append(
                 {
                     "id": branch_id,
-                    "sequence": sequence + ("A" if branch_index == 0 else "C" * branch_index),
+                    "sequence": sequence + tag + ("A" if branch_index == 0 else "C" * branch_index),
                     "colors": [int(strain)],
                     "coverage": coverage,
                 }
@@ -165,6 +172,7 @@ def generate_bubble_benchmark(
         for index in range(n_strains)
     ]
     graph = build_graph(graph_id=f"benchmark-{seed}", nodes=nodes, links=links, colors=colors)
+    graph.coverage_source = "simulated_poisson"
     return graph, truth
 
 
