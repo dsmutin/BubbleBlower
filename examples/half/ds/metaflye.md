@@ -1,6 +1,6 @@
 # metaFlye
 
-No metaFlye assembly was produced. No ONT reads were found, and the long-read simulator did not install, so no SLURM job was submitted and no GFA was written.
+No finished metaFlye assembly is on disk yet. `badread` 0.4.2 is installed at `/mnt/tank/scratch/dsmutin/envs/badread`. It is simulating 8× ONT from the ten `half_strains` genomes (`--seed 1`) into `examples/half/work/ont/reads.fastq`, and metaFlye will write `examples/half/work/flye`. The queued SLURM job 892944 was cancelled so it would not write that same directory. The notes below record the earlier failed install.
 
 ## Reads
 
