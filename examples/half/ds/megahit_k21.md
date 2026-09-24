@@ -23,13 +23,15 @@ training graph.
 
 ## Unitig graph after that removal
 
-| dataset | forward unitigs | links | simple bubbles |
-| --- | ---: | ---: | ---: |
-| high100 | 149792 | 12767 | 100 |
+| dataset | forward unitigs | links | simple bubbles | kmer_divergence retain / pop / split |
+| --- | ---: | ---: | ---: | --- |
+| high100 | 149792 | 12767 | 100 | 98 / 2 / 0 |
+| half_strains | 93070 | 41742 | 384 | 370 / 14 / 0 |
+| low75 | 122002 | 13669 | 135 | 134 / 1 / 0 |
+| low75half | 108039 | 32218 | 144 | 138 / 6 / 0 |
+| heldout_genera | 140306 | 67156 | 525 | 512 / 12 / 1 |
 
-`half_strains`, `low75`, `low75half`, and `heldout_genera` FASTG files are
-under `examples/half/work/megahit_k21/`. Their simple-bubble counts are
-being read with the same loader. `half100half` has no MEGAHIT run.
+`kmer_divergence` labels almost every remaining simple bubble as variation and keeps it. `heldout_genera` is the richest graph (525 bubbles). FASTG files are under `examples/half/work/megahit_k21/`. `half100half` has no MEGAHIT run.
 
 Grouping bubble sequences by a shared (k-1)-prefix and (k-1)-suffix does
 not recover one bubble per removed sequence: almost every sequence is its
