@@ -103,3 +103,11 @@ FLYE=/mnt/tank/scratch/dsmutin/tools/my/samovar/samovar/.cache/samovar/envs/flye
 ```
 
 BubbleBlower was not compared with Flye contigs. Misassembly counts are unknown.
+
+## Submitted after the quota failure
+
+The conda package cache was pointed at `/mnt/tank/scratch/dsmutin/conda-pkgs` and the env prefix at `/mnt/tank/scratch/dsmutin/envs/badread`, so the install does not write the home `pkgs/cache`. One SLURM job does both steps: install badread if needed, simulate 8× on the ten `half_strains` genomes, then `flye --meta`.
+
+Job id: `892944` (`bb-flye`, partition `main`, 8 CPUs, 8G). Script: `examples/half/work/ont/badread_flye.sbatch`.
+
+Eight metaSPAdes jobs for `low75`, `low75half`, `high100`, and `half_strains` (`892936`–`892943`) are pending. A 510G `cami3_illumina` job is running, and the extra assemblies sit in `QOSMaxMemoryPerUser` until that memory is free. They were resubmitted at 8G instead of 32G so they fit once the large job ends.
