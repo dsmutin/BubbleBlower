@@ -11,6 +11,8 @@ dependencies:
   - pyyaml=6.0.3
   - pip
   - pip:
-      - git+https://github.com/dsmutin/MetaMetro.git@15a0e134259f74adfeaa76d5eaf5d8171de650f2
+      # Editable checkout: metametro reads VERSION two directories above the
+      # package (the repository root). A wheel leaves that file out, so import fails.
+      - "-e git+https://github.com/dsmutin/MetaMetro.git@15a0e134259f74adfeaa76d5eaf5d8171de650f2#egg=metametro"
 variables:
   PYTHONPATH: src
