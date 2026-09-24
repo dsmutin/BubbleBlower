@@ -1,0 +1,15 @@
+name: bubbleblower
+channels:
+  - conda-forge
+dependencies:
+  - python=3.12
+  - setuptools
+  - pytest
+  - pytest-cov
+  - numpy
+  - pyyaml
+  - pip
+  - pip:
+      - git+https://github.com/dsmutin/MetaMetro.git
+variables:
+  PYTHONPATH: src

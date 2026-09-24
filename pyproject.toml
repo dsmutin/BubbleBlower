@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "bubbleblower"
+dynamic = ["version"]
+description = "Iterative debubbling of totally coloured assembly graphs"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.12"
+
+[project.scripts]
+bubbleblower = "bubbleblower.cli:main"
+
+[tool.setuptools.dynamic]
+version = { file = "VERSION" }
+
+[tool.setuptools.packages.find]
+where = ["src"]

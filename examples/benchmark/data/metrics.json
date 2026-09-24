@@ -1,0 +1,10 @@
+{
+  "precision_error": 1.0,
+  "recall_error": 0.92,
+  "f1_error": 0.9583333333333334,
+  "auroc_error": 0.9952,
+  "tp": 23.0,
+  "fp": 0.0,
+  "fn": 2.0,
+  "tn": 25.0
+}
