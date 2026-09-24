@@ -48,5 +48,80 @@
       "mismatches_per_100kbp",
       "duplication"
     ]
+  },
+  "low75": {
+    "megahit_final": {
+      "n50": 465.0,
+      "n_contigs": 2684.0,
+      "total_length": 1350101.0,
+      "genome_fraction": 0.006598221162079152,
+      "misassemblies": 1.0,
+      "mismatches_per_100kbp": 139.19942732801496,
+      "duplication": 0.006615901625564304
+    },
+    "read_colour_break": {
+      "n50": 462.0,
+      "n_contigs": 2737.0,
+      "total_length": 1350304.0,
+      "genome_fraction": 0.006578465015153183,
+      "misassemblies": 0.0,
+      "mismatches_per_100kbp": 137.43970114750886,
+      "duplication": 0.006596081077958786
+    },
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "duplication"
+    ]
+  },
+  "low75half": {
+    "megahit_final": {
+      "n50": 429.0,
+      "n_contigs": 4090.0,
+      "total_length": 1881332.0,
+      "genome_fraction": 0.01804325076841657,
+      "misassemblies": 2.0,
+      "mismatches_per_100kbp": 232.6635771549887,
+      "duplication": 0.018165536967597373
+    },
+    "read_colour_break": {
+      "n50": 426.0,
+      "n_contigs": 4146.0,
+      "total_length": 1881802.0,
+      "genome_fraction": 0.017984405836628164,
+      "misassemblies": 1.0,
+      "mismatches_per_100kbp": 230.81591273338992,
+      "duplication": 0.01810583392165114
+    },
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "duplication"
+    ]
+  },
+  "high100": {
+    "megahit_final": {
+      "n50": 428.0,
+      "n_contigs": 988.0,
+      "total_length": 520172.0,
+      "genome_fraction": 0.0006336511506097001,
+      "misassemblies": 2.0,
+      "mismatches_per_100kbp": 103.55364860534728,
+      "duplication": 0.0006339273571086397
+    },
+    "read_colour_break": {
+      "n50": 421.0,
+      "n_contigs": 1031.0,
+      "total_length": 520458.0,
+      "genome_fraction": 0.0006278433825669766,
+      "misassemblies": 0.0,
+      "mismatches_per_100kbp": 99.97574552919114,
+      "duplication": 0.0006281195890659162
+    },
+    "wins": [
+      "misassemblies",
+      "mismatches_per_100kbp",
+      "duplication"
+    ]
   }
 }

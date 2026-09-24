@@ -62,7 +62,7 @@ A misassembly here is one contig with two alignments of at least 200 bp on diffe
 
 ## Colour break on the final contigs
 
-`read_colour_break` applied to the final FASTA, using the example's own Illumina reads, cuts the long two-genome contigs without going back to k21. It wins misassemblies, mismatches, and duplication. Genome fraction falls. N50 falls a little.
+`read_colour_break` applied to the final FASTA, using the example's own Illumina reads, cuts the long two-genome contigs without going back to k21. On every finished set it wins misassemblies, mismatches, and duplication. Genome fraction falls. N50 falls a little. `half100half` has no reads and no final contigs.
 
 | dataset | assembly | N50 | genome fraction | misassemblies | mismatches / 100 kbp | duplication |
 | --- | --- | ---: | ---: | ---: | ---: | ---: |
@@ -70,3 +70,9 @@ A misassembly here is one contig with two alignments of at least 200 bp on diffe
 | half_strains | colour break | 436 | 0.0924 | 9 | 167.7 | 0.0927 |
 | heldout_genera | final | 390 | 0.0276 | 45 | 318.9 | 0.0276 |
 | heldout_genera | colour break | 343 | 0.0220 | 12 | 193.2 | 0.0220 |
+| low75 | final | 465 | 0.0066 | 1 | 139.2 | 0.0066 |
+| low75 | colour break | 462 | 0.0066 | 0 | 137.4 | 0.0066 |
+| low75half | final | 429 | 0.0180 | 2 | 232.7 | 0.0182 |
+| low75half | colour break | 426 | 0.0180 | 1 | 230.8 | 0.0181 |
+| high100 | final | 428 | 0.0006 | 2 | 103.6 | 0.0006 |
+| high100 | colour break | 421 | 0.0006 | 0 | 100.0 | 0.0006 |
