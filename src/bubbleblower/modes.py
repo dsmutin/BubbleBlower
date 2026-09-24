@@ -5,6 +5,7 @@
 and its coverage is a small fraction of that branch.
 ``greedy`` is the global score search.
 ``kmer_divergence`` and ``colour_topology`` are graph-only debubblers.
+``read_colour_break`` keeps the graph and splits contigs where the read colour changes.
 """
 
 from __future__ import annotations

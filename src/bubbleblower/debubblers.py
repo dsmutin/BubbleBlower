@@ -16,7 +16,7 @@ from dataclasses import dataclass
 from metametro.errors import ContractError
 
 from bubbleblower.detect import Bubble, detect_bubbles
-from bubbleblower.edits import pop_branch, split_instance
+from bubbleblower.edits import merge_adjacent, pop_branch, split_instance
 from bubbleblower.features import BubbleFeatures, extract_features
 from bubbleblower.graph import AssemblyGraph
 
@@ -212,6 +212,36 @@ def _apply_split(graph: AssemblyGraph, bubble: Bubble, name: str, features: Bubb
     return updated
 
 
+def compact_same_colour(graph: AssemblyGraph) -> AssemblyGraph:
+    """Merge simple same-colour links until none remain.
+
+    A link is simple when its source has no other outgoing link and its
+    target has no other incoming link. Different colours are left apart.
+    """
+    current = graph.copy()
+    for _ in range(len(current.cdbg.links) + 1):
+        chosen = None
+        outgoing: dict[str, int] = {}
+        incoming: dict[str, int] = {}
+        for link in current.cdbg.links:
+            outgoing[link.source] = outgoing.get(link.source, 0) + 1
+            incoming[link.target] = incoming.get(link.target, 0) + 1
+        for link in current.cdbg.links:
+            if outgoing.get(link.source, 0) != 1 or incoming.get(link.target, 0) != 1:
+                continue
+            if link.overlap is None:
+                continue
+            left = current.unitig(link.source).color_ids
+            right = current.unitig(link.target).color_ids
+            if left and list(left) == list(right):
+                chosen = link.link_id
+                break
+        if chosen is None:
+            break
+        current, _edit = merge_adjacent(current, chosen)
+    return current
+
+
 def resolve_debubbler(graph: AssemblyGraph, name: str) -> AssemblyGraph:
     """Return a new graph edited by the named debubbler. The input is copied."""
     if name not in DEBUBBLERS:
@@ -243,4 +273,4 @@ def resolve_debubbler(graph: AssemblyGraph, name: str) -> AssemblyGraph:
             skipped.add(bubble.bubble_id)
         if not acted:
             break
-    return current
+    return compact_same_colour(current)

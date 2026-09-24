@@ -4,7 +4,9 @@ from __future__ import annotations
 
 import pytest
 
-from bubbleblower.debubblers import classify_debubble, resolve_debubbler
+from bubbleblower.colour_break import break_read_colour_chimeras
+from bubbleblower.debubblers import classify_debubble, compact_same_colour, resolve_debubbler
+from bubbleblower.edits import merge_adjacent, revert
 from bubbleblower.detect import detect_bubbles
 from bubbleblower.fixtures import error_bubble, strain_bubble
 from bubbleblower.graph import build_graph
@@ -79,3 +81,60 @@ def test_three_branch_bubble_is_multi() -> None:
         assert decision.label == "multi"
         resolved = resolve_debubbler(graph, name)
         resolved.validate()
+
+
+def test_read_colour_break_splits_a_chimera(tmp_path) -> None:
+    """A contig painted by two accessions is emitted as two pieces."""
+    left = "A" * 24
+    right = "C" * 24
+    chimera = left + right
+    fastq = tmp_path / "reads.fastq"
+    lines = []
+    for index in range(3):
+        lines.extend([f"@GCF_000000001_{index}", left + "T" * 8, "+", "I" * 32])
+        lines.extend([f"@GCF_000000002_{index}", "G" * 8 + right, "+", "I" * 32])
+    fastq.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    broken = break_read_colour_chimeras(
+        [("chimera", chimera), ("plain", left + "T" * 8)],
+        [fastq],
+        k=8,
+        min_run=4,
+        min_piece=10,
+    )
+    pieces = [sequence for name, sequence in broken if name.startswith("chimera")]
+    assert len(pieces) >= 2
+    assert any(set(piece) == {"A"} for piece in pieces)
+    assert any(set(piece) == {"C"} for piece in pieces)
+    plain = [sequence for name, sequence in broken if name == "plain"]
+    assert plain == [left + "T" * 8]
+
+
+def test_adjacent_same_colour_nodes_merge() -> None:
+    """A simple same-colour path collapses. Different colours stay apart."""
+    graph = build_graph(
+        graph_id="linear",
+        colors=[
+            {"color_id": "0", "namespace": "taxon", "value": "taxon_1"},
+            {"color_id": "1", "namespace": "taxon", "value": "taxon_2"},
+        ],
+        nodes=[
+            {"id": "A", "sequence": "ACGTACGT", "colors": [0], "coverage": 10.0},
+            {"id": "B", "sequence": "TTGGTTGG", "colors": [0], "coverage": 10.0},
+            {"id": "C", "sequence": "GGCCAAGG", "colors": [1], "coverage": 10.0},
+        ],
+        links=[
+            {"id": "eAB", "source": "A", "target": "B", "colors": [0], "coverage": 10.0},
+            {"id": "eBC", "source": "B", "target": "C", "colors": [0, 1], "coverage": 10.0},
+        ],
+    )
+    for link in graph.cdbg.links:
+        link.overlap = 0
+    merged, edit = merge_adjacent(graph, "eAB")
+    assert len(merged.cdbg.unitigs) == 2
+    sequences = {unitig.sequence for unitig in merged.cdbg.unitigs}
+    assert "ACGTACGTTTGGTTGG" in sequences
+    restored = revert(merged, edit)
+    assert {unitig.unitig_id for unitig in restored.cdbg.unitigs} == {"A", "B", "C"}
+    compacted = compact_same_colour(graph)
+    assert any(unitig.sequence == "ACGTACGTTTGGTTGG" for unitig in compacted.cdbg.unitigs)
+    assert any(unitig.sequence == "GGCCAAGG" for unitig in compacted.cdbg.unitigs)

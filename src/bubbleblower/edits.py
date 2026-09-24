@@ -220,6 +220,78 @@ def merge_instances(graph: AssemblyGraph, instance_ids: list[str], target_id: st
     return updated, edit
 
 
+def merge_adjacent(graph: AssemblyGraph, link_id: str) -> tuple[AssemblyGraph, Edit]:
+    """Collapse one link into a single unitig.
+
+    The source must have only this outgoing link and the target only this
+    incoming link. Colours must be equal and non-empty. The stored overlap is
+    consumed. A missing overlap is refused.
+    """
+    updated = graph.copy()
+    link = updated.link(link_id)
+    if link.overlap is None:
+        raise ValueError(f"link {link_id} has no overlap")
+    outgoing = [item for item in updated.cdbg.links if item.source == link.source]
+    incoming = [item for item in updated.cdbg.links if item.target == link.target]
+    if len(outgoing) != 1 or outgoing[0].link_id != link_id:
+        raise ValueError(f"{link.source} is not a simple path into {link_id}")
+    if len(incoming) != 1 or incoming[0].link_id != link_id:
+        raise ValueError(f"{link.target} is not a simple path out of {link_id}")
+    left = updated.unitig(link.source)
+    right = updated.unitig(link.target)
+    if not left.color_ids or list(left.color_ids) != list(right.color_ids):
+        raise ValueError("adjacent merge requires equal non-empty colours")
+    if link.overlap > len(right.sequence):
+        raise ValueError(f"overlap on {link_id} is longer than the target")
+    joined = left.sequence + right.sequence[link.overlap :]
+    touched = {link.source, link.target}
+    snapshot = {
+        "unitigs": [copy.deepcopy(updated.unitig(unitig_id)) for unitig_id in touched],
+        "mapping": [copy.deepcopy(row) for row in updated.cdbg.mapping if row.unitig_id in touched],
+        "links": [
+            copy.deepcopy(item)
+            for item in updated.cdbg.links
+            if item.source in touched or item.target in touched
+        ],
+        "node_coverage": {unitig_id: updated.node_coverage[unitig_id] for unitig_id in touched},
+        "link_coverage": {
+            item.link_id: updated.link_coverage[item.link_id]
+            for item in updated.cdbg.links
+            if item.source in touched or item.target in touched
+        },
+        "lineage": {unitig_id: dict(updated.lineage[unitig_id]) for unitig_id in touched},
+    }
+    coverage = (updated.node_coverage[link.source] + updated.node_coverage[link.target]) / 2.0
+    new_id = _add_unitig(
+        updated,
+        sequence=joined,
+        color_ids=list(left.color_ids),
+        coverage=coverage,
+        parent=link.source,
+    )
+    for item in updated.cdbg.links:
+        if item.link_id == link_id:
+            continue
+        if item.source in touched:
+            item.source = new_id
+        if item.target in touched:
+            item.target = new_id
+    updated.cdbg.links = [item for item in updated.cdbg.links if item.link_id != link_id]
+    updated.link_coverage.pop(link_id, None)
+    for unitig_id in touched:
+        _drop_unitig(updated, unitig_id)
+    edit = Edit(
+        edit_id=_remember(updated, "merge"),
+        edit_type="merge",
+        source_ids=(link.source, link.target),
+        target_ids=(new_id,),
+        reason=f"merge adjacent {link.source} {link.target}",
+        payload=snapshot,
+    )
+    updated.validate()
+    return updated, edit
+
+
 def _collapse_parallel(graph: AssemblyGraph) -> None:
     """Sum coverage of links that share endpoints, orientation, and colours."""
     grouped: dict[tuple, list[Link]] = {}

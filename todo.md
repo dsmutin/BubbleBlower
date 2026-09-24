@@ -11,4 +11,5 @@ Scaffold checklist. Check a box only after mandatory tests pass.
 - [x] AMBER F1 is the primary quality metric
 - [x] Close-strain metaSPAdes graph coloured and scored (VERSION 0.4.0)
 - [x] Graph-only debubblers kmer_divergence and colour_topology (VERSION 0.5.0)
+- [x] Adjacent same-colour merge, inverse of a linear split (VERSION 0.6.0)
 - [ ] Beat metaSPAdes and metaFlye on every assembly metric
