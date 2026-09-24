@@ -243,16 +243,21 @@ def compact_same_colour(graph: AssemblyGraph) -> AssemblyGraph:
     return current
 
 
-def resolve_debubbler(graph: AssemblyGraph, name: str) -> AssemblyGraph:
-    """Return a new graph edited by the named debubbler. The input is copied."""
+def resolve_debubbler(graph: AssemblyGraph, name: str, *, max_edits: int | None = None) -> AssemblyGraph:
+    """Return a new graph edited by the named debubbler. The input is copied.
+
+    ``max_edits`` stops a cascade of new bubbles. The default allows a short
+    cascade of the bubbles present at the start, not one edit per unitig.
+    """
     if name not in DEBUBBLERS:
         raise ValueError(f"unknown debubbler: {name}")
     current = graph.copy()
     skipped: set[str] = set()
-    # One pass per original bubble, with room for a short cascade. A cap on
-    # unitig count re-splits the same signature for hours on a MEGAHIT graph.
-    limit = max(8, len(detect_bubbles(current)) * 3)
-    for _ in range(limit):
+    limit = max_edits if max_edits is not None else max(8, len(detect_bubbles(current)) * 3)
+    edits = 0
+    for _ in range(max(1, limit)):
+        if max_edits is not None and edits >= max_edits:
+            break
         acted = False
         for bubble in detect_bubbles(current):
             if bubble.bubble_id in skipped:
@@ -263,6 +268,7 @@ def resolve_debubbler(graph: AssemblyGraph, name: str) -> AssemblyGraph:
                 continue
             if decision.action == "pop" and decision.branch_index is not None:
                 current, _edit = pop_branch(current, bubble, decision.branch_index)
+                edits += 1
                 acted = True
                 break
             if decision.action == "split":
@@ -273,6 +279,7 @@ def resolve_debubbler(graph: AssemblyGraph, name: str) -> AssemblyGraph:
                     continue
                 current = edited
                 skipped.add(bubble.bubble_id)
+                edits += 1
                 acted = True
                 break
             skipped.add(bubble.bubble_id)

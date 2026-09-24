@@ -162,7 +162,8 @@ def main() -> int:
             counts = decision_counts(graph, debubbler)
             print("decisions", debubbler, counts, flush=True)
             print("resolving", name, debubbler, flush=True)
-            resolved = resolve_debubbler(graph, debubbler)
+            n_edits = sum(count for key, count in counts.items() if not key.endswith(":retain"))
+            resolved = resolve_debubbler(graph, debubbler, max_edits=n_edits)
             fasta = out_dir / f"{name}_{debubbler}.fasta"
             write_unitigs(resolved, fasta)
             print("scoring", name, debubbler, "unitigs", len(resolved.cdbg.unitigs), flush=True)
