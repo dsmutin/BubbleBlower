@@ -26,4 +26,11 @@ On `half_strains` the break is applied to the bulge-on contigs. On the close str
 
 ## Graph debubblers on the close-strain keep graph
 
-The keep graph has 7,866 unitigs, 341 links, and 27 simple bubbles. Contigs are walked with link orientation. Against bulge-on contigs, `kmer_divergence` pops one bubble and retains 26; `colour_topology` retains all 27. Neither cuts the misassemblies (10 remain; bulge-on has 9). Both win mismatches (213 versus 600) and duplication, and lose genome fraction. That is two of the four main scores. The misassemblies that matter are chimeric unitigs, which the read-colour break cuts and these bubble edits do not. Numbers are in `examples/half/data/spades_debubble_metrics.json`.
+Contigs are walked with link orientation and scored against bulge-on contigs.
+
+| dataset | bubbles | kmer_divergence | colour_topology | misassemblies | mismatches / 100 kbp |
+| --- | ---: | --- | --- | ---: | ---: |
+| close strains k33 | 27 | 26 retain, 1 pop | 27 retain | 10 (bulge-on 9) | 213 (bulge-on 600) |
+| half_strains k55 | 10 | 8 retain, 2 pop | 10 retain | 19 (bulge-on 18) | 131 (bulge-on 1017) |
+
+Both modes win mismatches and duplication. Both lose misassemblies and genome fraction. That is two of the four main scores. Popping the weak branch does not remove the chimeric unitigs. The read-colour break does. Numbers are in `examples/half/data/spades_debubble_metrics.json`.
