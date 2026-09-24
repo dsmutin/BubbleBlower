@@ -146,6 +146,25 @@ def test_read_colour_break_reads_badread_accession(tmp_path) -> None:
     assert any(set(piece) == {"C"} for piece in pieces)
 
 
+def test_read_colour_break_skips_reads_without_accession(tmp_path) -> None:
+    """A badread junk header has no genome and must not abort the break."""
+    sequence = "A" * 24
+    fastq = tmp_path / "ont.fastq"
+    lines = [
+        "@d1a76fea-7ac3-25e8-e0dc-e8b011a7a067 random_seq length=24",
+        sequence,
+        "+",
+        "I" * 24,
+        "@uuid GCF_000000001|0,+strand,1-40 length=24",
+        sequence,
+        "+",
+        "I" * 24,
+    ]
+    fastq.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    broken = break_read_colour_chimeras([("plain", sequence)], [fastq], k=8, min_run=4, min_piece=10)
+    assert broken == [("plain", sequence)]
+
+
 def test_adjacent_same_colour_nodes_merge() -> None:
     """A simple same-colour path collapses. Different colours stay apart."""
     graph = build_graph(

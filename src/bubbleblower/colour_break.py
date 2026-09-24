@@ -36,7 +36,10 @@ def _read_kmer_counts(fastq_paths: list[Path], needed: set[str], k: int) -> dict
     for path in fastq_paths:
         lines = path.read_text(encoding="utf-8").splitlines()
         for offset in range(0, len(lines), 4):
-            genome = _genome_id(lines[offset][1:])
+            try:
+                genome = _genome_id(lines[offset][1:])
+            except ValueError:
+                continue
             sequence = lines[offset + 1].strip().upper()
             seen: set[str] = set()
             if len(sequence) < k:
