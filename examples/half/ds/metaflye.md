@@ -7,6 +7,8 @@ Flye 2.9.6-b1802 assembled the `badread` 0.4.2 8× ONT reads of the ten `half_st
 | metaFlye | 618961 | 0.8473 | 51 | 606.0 | 0.8599 |
 | colour break | 250 | 0.5277 | 1 | 133.0 | 0.5491 |
 
+The Flye assembly graph has 468 unitigs, 418 links, and 11 simple bubbles. `kmer_divergence` retains all 11. `colour_topology` splits 3 and retains 8. Against the polished contigs both win mismatches and duplication only. Misassemblies stay at 52 and 54 versus 51, and genome fraction is lower. That is two of the four main scores. The read-colour break is the mode that cuts the misassemblies. Numbers are in `examples/half/data/flye_debubble_metrics.json`.
+
 The notes below record the earlier failed install. The queued SLURM job 892944 was cancelled so it would not write the same directory.
 
 ## Reads

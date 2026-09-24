@@ -18,5 +18,6 @@ Scaffold checklist. Check a box only after mandatory tests pass.
 - [x] Cap debubbler edits at the first-pass decision count (VERSION 0.6.4)
 - [x] Read a badread accession from the header comment (VERSION 0.6.5)
 - [x] Skip badread junk reads that have no accession (VERSION 0.6.6)
+- [x] Read Flye dp:i: coverage from GFA (VERSION 0.6.7)
 - [ ] Beat metaSPAdes, MEGAHIT k21 bubble removal, and metaFlye on the majority of main scores
 - [ ] Train debubblers on initial MEGAHIT graphs (k21 FASTG plus bubble_seq.fa) from half_strains, low75, low75half, high100, heldout_genera

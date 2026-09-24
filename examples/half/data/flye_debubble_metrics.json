@@ -1,0 +1,53 @@
+{
+  "half_strains": {
+    "n_bubbles": 11,
+    "modes": {
+      "kmer_divergence": {
+        "decisions": {
+          "variation:retain": 11
+        },
+        "metrics": {
+          "n50": 692429.0,
+          "n_contigs": 439.0,
+          "total_length": 40228659.0,
+          "genome_fraction": 0.8218661213051897,
+          "misassemblies": 52.0,
+          "mismatches_per_100kbp": 543.7357565357796,
+          "duplication": 0.8398437794614728
+        },
+        "wins": [
+          "mismatches_per_100kbp",
+          "duplication"
+        ]
+      },
+      "colour_topology": {
+        "decisions": {
+          "variation:split": 3,
+          "variation:retain": 8
+        },
+        "metrics": {
+          "n50": 692429.0,
+          "n_contigs": 438.0,
+          "total_length": 40274870.0,
+          "genome_fraction": 0.8221687601463988,
+          "misassemblies": 54.0,
+          "mismatches_per_100kbp": 548.2825180949684,
+          "duplication": 0.8408467989433211
+        },
+        "wins": [
+          "mismatches_per_100kbp",
+          "duplication"
+        ]
+      }
+    },
+    "metaflye": {
+      "n50": 618961.0,
+      "n_contigs": 309.0,
+      "total_length": 41239425.0,
+      "genome_fraction": 0.8472832925817828,
+      "misassemblies": 51.0,
+      "mismatches_per_100kbp": 605.991381865434,
+      "duplication": 0.859896118502735
+    }
+  }
+}

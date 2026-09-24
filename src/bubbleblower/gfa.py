@@ -1,7 +1,7 @@
 """Load an assembly GFA into a MetaMetro CDBG.
 
-Segments become unitigs. Links become edges. Coverage is read from ``DP``
-or ``KC`` tags when the GFA stores them. Missing tags stay absent.
+Segments become unitigs. Links become edges. Coverage is read from ``DP``,
+Flye's ``dp``, or ``KC`` tags when the GFA stores them. Missing tags stay absent.
 """
 
 from __future__ import annotations
@@ -22,8 +22,9 @@ def _tags(fields: list[str]) -> dict[str, str]:
 
 
 def _coverage(tags: dict[str, str], length: int) -> float | None:
-    if "DP" in tags:
-        return float(tags["DP"])
+    for key in ("DP", "dp"):
+        if key in tags:
+            return float(tags[key])
     if "KC" in tags and length > 0:
         return float(tags["KC"]) / length
     return None

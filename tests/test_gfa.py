@@ -46,6 +46,14 @@ def _fastq(path: Path) -> None:
     path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
+def test_flye_lowercase_dp_is_coverage(tmp_path: Path) -> None:
+    """Flye writes depth as ``dp:i:``, not ``DP``."""
+    path = tmp_path / "flye.gfa"
+    path.write_text("S\tedge_1\tACGTACGTACGTACGTACGTACGTACGTACGT\tdp:i:8\n", encoding="utf-8")
+    graph, _ids = load_gfa(path, graph_id="flye")
+    assert graph.node_coverage["edge_1"] == 8.0
+
+
 def test_gfa_bubble_and_colour_pop(tmp_path: Path) -> None:
     """A same-colour 1x branch is popped; the 90x branch stays."""
     gfa = tmp_path / "graph.gfa"
