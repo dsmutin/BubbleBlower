@@ -1,0 +1,37 @@
+{
+  "n_unitigs": 7866,
+  "n_links": 341,
+  "n_bubbles": 27,
+  "n_colours": 3,
+  "modes": {
+    "retain": {
+      "n50": 286.0,
+      "n_contigs": 7866.0,
+      "total_length": 2233708.0,
+      "genome_fraction": 0.12261683038737162,
+      "misassemblies": 9.0,
+      "mismatches_per_100kbp": 212.75245945468305,
+      "duplication": 0.12280840635920925,
+      "n_bubbles": 27
+    },
+    "colour_pop": {
+      "n50": 286.0,
+      "n_contigs": 7866.0,
+      "total_length": 2233708.0,
+      "genome_fraction": 0.12261683038737162,
+      "misassemblies": 9.0,
+      "mismatches_per_100kbp": 212.75245945468305,
+      "duplication": 0.12280840635920925,
+      "n_bubbles": 27
+    }
+  },
+  "metaspades": {
+    "n50": 289.0,
+    "n_contigs": 7524.0,
+    "total_length": 2219818.0,
+    "genome_fraction": 0.12339308175619376,
+    "misassemblies": 9.0,
+    "mismatches_per_100kbp": 599.837109074443,
+    "duplication": 0.12358869237086603
+  }
+}

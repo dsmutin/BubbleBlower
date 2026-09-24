@@ -30,6 +30,10 @@ conda-bld/
 .vscode/
 *.swp
 
+# generated assembler output
+examples/half/work/
+examples/half/data/*.fasta
+
 # runtime
 .snakemake/
 .Rproj.user/

@@ -29,6 +29,7 @@ python examples/toy/run.py
 python examples/benchmark/run.py
 python examples/error/run.py
 python examples/reads/run.py
+python examples/half/run.py
 ```
 
 `bubbleblower` classifies the built-in two-taxon strain bubble and prints JSON.

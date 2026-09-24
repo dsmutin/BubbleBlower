@@ -1,0 +1,12 @@
+# Close strains from half_strains (Escherichia coli, Shigella sonnei, E. albertii).
+# The full ten-strain k=55 graph has 4 bubbles. This subset at k=21,33 keeps 27.
+
+reads_r1: examples/half/work/close/R1.fastq
+reads_r2: examples/half/work/close/R2.fastq
+graph: examples/half/work/close/spades_keep/assembly_graph_with_scaffolds.gfa
+baseline_contigs: examples/half/work/close/spades_pop/contigs.fasta
+references: examples/half/work/close/references.fna
+minimap2: /mnt/tank/scratch/dsmutin/partition-metagenomics/envs/vaegbin_env/bin/minimap2
+k: 21
+min_depth: 2
+min_align: 200
