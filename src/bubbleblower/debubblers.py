@@ -216,7 +216,8 @@ def compact_same_colour(graph: AssemblyGraph) -> AssemblyGraph:
     """Merge simple same-colour links until none remain.
 
     A link is simple when its source has no other outgoing link and its
-    target has no other incoming link. Different colours are left apart.
+    target has no other incoming link. Only forward-forward links are merged.
+    Different colours are left apart.
     """
     current = graph.copy()
     for _ in range(len(current.cdbg.links) + 1):
@@ -229,7 +230,7 @@ def compact_same_colour(graph: AssemblyGraph) -> AssemblyGraph:
         for link in current.cdbg.links:
             if outgoing.get(link.source, 0) != 1 or incoming.get(link.target, 0) != 1:
                 continue
-            if link.overlap is None:
+            if link.overlap is None or link.orientation != "++":
                 continue
             left = current.unitig(link.source).color_ids
             right = current.unitig(link.target).color_ids

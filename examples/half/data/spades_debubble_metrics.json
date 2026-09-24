@@ -1,0 +1,53 @@
+{
+  "close_k33": {
+    "n_bubbles": 27,
+    "modes": {
+      "kmer_divergence": {
+        "decisions": {
+          "variation:retain": 26,
+          "error:pop": 1
+        },
+        "metrics": {
+          "n50": 286.0,
+          "n_contigs": 7864.0,
+          "total_length": 2233869.0,
+          "genome_fraction": 0.12262768218534063,
+          "misassemblies": 10.0,
+          "mismatches_per_100kbp": 213.3493123491702,
+          "duplication": 0.12282350148843539
+        },
+        "wins": [
+          "mismatches_per_100kbp",
+          "duplication"
+        ]
+      },
+      "colour_topology": {
+        "decisions": {
+          "variation:retain": 27
+        },
+        "metrics": {
+          "n50": 286.0,
+          "n_contigs": 7866.0,
+          "total_length": 2233999.0,
+          "genome_fraction": 0.12262065634178378,
+          "misassemblies": 10.0,
+          "mismatches_per_100kbp": 213.3493123491702,
+          "duplication": 0.12282350148843539
+        },
+        "wins": [
+          "mismatches_per_100kbp",
+          "duplication"
+        ]
+      }
+    },
+    "metaspades_pop": {
+      "n50": 289.0,
+      "n_contigs": 7524.0,
+      "total_length": 2219818.0,
+      "genome_fraction": 0.12339308175619376,
+      "misassemblies": 9.0,
+      "mismatches_per_100kbp": 599.837109074443,
+      "duplication": 0.12358869237086603
+    }
+  }
+}
