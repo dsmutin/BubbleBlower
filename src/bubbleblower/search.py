@@ -140,12 +140,19 @@ def greedy_search(
     patience: int = 1,
     mode: str = "coverage",
     max_runtime_s: float | None = 90.0,
+    frames: list[AssemblyGraph] | None = None,
 ) -> SearchResult:
-    """Accept the single best improving edit at each iteration."""
+    """Accept the single best improving edit at each iteration.
+
+    When ``frames`` is given, it receives a copy of the graph before the
+    search and a copy after every accepted edit.
+    """
     started = time.monotonic()
     current = graph.copy()
     result = SearchResult(graph=current)
     result.scores.append(score_graph(current))
+    if frames is not None:
+        frames.append(current.copy())
     stalled = 0
     state_id = 0
     for iteration in range(max_iterations):
@@ -198,6 +205,8 @@ def greedy_search(
         result.scores.append(best_score)
         current = best_graph
         result.graph = current
+        if frames is not None:
+            frames.append(current.copy())
     return result
 
 

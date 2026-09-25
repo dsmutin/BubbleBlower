@@ -9,6 +9,8 @@ dependencies:
   - pytest-cov=7.1.0
   - numpy=2.5.3
   - pyyaml=6.0.3
+  - matplotlib=3.10.8
+  - pillow=11.3.0
   - pip
   - pip:
       # Editable checkout: metametro reads VERSION two directories above the
