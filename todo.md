@@ -1,25 +1,39 @@
 # bubbleblower features
 
-Scaffold checklist. Check a box only after mandatory tests pass.
+Check a box only after mandatory tests pass. This is the implementation contract.
+
+## Graph source
+
+- [x] Edit a MetaMetro ToCUMG (`cfa_to_cdbg` / `load_cdbg`). Do not assemble unitigs in BubbleBlower (VERSION 0.7.0)
+- [x] A CGT is a view of that ToCUMG (`from_cgt`, `as_cgt`). It is not a second graph
+- [x] GFA and MEGAHIT FASTG enter through MetaMetro `gfa_to_cfa` and `fastg_to_cfa`
+- [x] Read colouring is MetaMetro `colour_by_read_accessions`; examples select ToCUMG namespaces
+
+## Edits and launch criteria
+
+- [ ] On each iteration, either merge two nodes that sit in one bubble or next to each other, unioning their colours, or split one node
+- [ ] A split partitions that node's colour: a binary 0/1 mask, or a gradual weight in `[0, 1]`, chosen by the method and by whether the colour channel is a mask or a score
+- [ ] A launch criterion chooses merge versus split. Bayesian criteria that exist today are posteriors only: `coverage` (Poisson, `coverage-poisson-1`) and `multimodal` (those coverage terms plus colour equality, long-read linkage, and k-mer support). They adjust a pop candidate. They do not choose merge versus split
+- [ ] An ML launch criterion on a CGT (NumPy GCN or PyG GCN from MetaMetro). Not implemented. `kmer_divergence` and `colour_topology` are fixed thresholds, not a trained model
+
+## Benchmarks
+
+- [ ] Debubbling with those two edits is compared with the assembler's own bubble removal
+- [ ] The comparison reports AMBER F1, contig F1, misassemblies, mismatches, N50, and runtime
+- [ ] That comparison is reproducible from pinned inputs, a seed, and recorded commands
+- [ ] Benchmark colours use the taxid assigned to each read before the metagenome was generated. See CONTRIBUTING.md
+
+## Already checked, and still true
 
 - [x] CLI resolves the strain bubble (`status=resolved`)
-- [x] Detect, classify, reversible edits, greedy search (VERSION 0.1.0)
+- [x] Detect, classify, reversible edits, greedy search
 - [x] Beam search and MCMC
-- [x] Read-level example via MetaMetro (`examples/reads/run.py`)
+- [x] Read-level example adopts the MetaMetro ToCUMG (`examples/reads/run.py`). That graph has no simple bubble
 - [x] Contract tables: `bubble_results.tsv`, `edit_history.tsv`, `state_scores.tsv`
-- [x] Colour-aware score; no strain false pops (VERSION 0.3.0)
-- [x] AMBER F1 is the primary quality metric
-- [x] Close-strain metaSPAdes graph coloured and scored (VERSION 0.4.0)
-- [x] Graph-only debubblers kmer_divergence and colour_topology (VERSION 0.5.0)
-- [x] Adjacent same-colour merge, inverse of a linear split (VERSION 0.6.0)
-- [x] In-place adjacent merge so compaction can run on a large graph (VERSION 0.6.1)
-- [x] Orientation-aware contig walk (VERSION 0.6.2)
-- [x] Do not re-split the same bubble signature (VERSION 0.6.3)
-- [x] Cap debubbler edits at the first-pass decision count (VERSION 0.6.4)
-- [x] Read a badread accession from the header comment (VERSION 0.6.5)
-- [x] Skip badread junk reads that have no accession (VERSION 0.6.6)
-- [x] Read Flye dp:i: coverage from GFA (VERSION 0.6.7)
-- [x] Install MetaMetro editable so its VERSION file is on the import path (VERSION 0.6.8)
-- [x] Full CI runs the light toy, error, reads, and benchmark examples (VERSION 0.6.9)
+- [x] Colour-aware score
+- [x] AMBER F1 on the synthetic 50-bubble graph (seed 42). Those colours are fixture labels, not pre-generation taxids
+- [x] Graph-only debubblers `kmer_divergence` and `colour_topology`
+- [x] Adjacent same-colour merge (equal colours; not a union of different colours)
+- [x] In-place adjacent merge
+- [x] Orientation-aware contig walk
 - [ ] Beat metaSPAdes, MEGAHIT k21 bubble removal, and metaFlye on the majority of main scores
-- [ ] Train debubblers on initial MEGAHIT graphs (k21 FASTG plus bubble_seq.fa) from half_strains, low75, low75half, high100, heldout_genera

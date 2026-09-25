@@ -1,0 +1,14 @@
+---
+description: Colouring methods live in MetaMetro; this tool selects ToCUMG namespaces
+alwaysApply: true
+---
+
+# Colourings
+
+Do not add a new colouring method in this repository. Add it in MetaMetro and open a pull request there.
+
+Do not mock a colouring. Tests may parse a tiny FASTQ or classifier file in that tool's format. They must not invent colour masks.
+
+Check that a selected colouring is compatible with the MetaMetro build: the namespace must exist on the ToCUMG.
+
+Use MetaMetro colourings and `filter_colours` / `load_bench_graph(..., namespaces=...)` to keep the layers this tool needs.

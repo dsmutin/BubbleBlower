@@ -69,6 +69,22 @@ Do not mock a benchmark graph, a taxonomy label, or a metric. A tiny graph that 
 
 Do not copy an evaluation target into graph features, colours, or any file a model reads as input. Ground truth stays in `ground_truth/` and is used only by the scorer.
 
+## Colourings
+
+Do not add a new colouring method in this repository. Add it in MetaMetro (`metametro.bench.colourings`) and open a pull request there.
+
+Do not mock a colouring. Paint graphs with MetaMetro colourings, or load the ToCUMG namespaces the bench already wrote.
+
+Check that a selected colouring exists on the current MetaMetro build (`metametro benchbuild --list-colourings` and the bench `manifest.yaml`). If the namespace is missing, stop.
+
+Use MetaMetro to select layers:
+
+```python
+from bubbleblower.bench_input import load_bench_graph
+
+root, graph = load_bench_graph("bubble_strain_2", namespaces=("taxon", "composition"))
+```
+
 ## Taxon identifiers
 
 Two checks apply to every benchmark and to every graph tensor a model trains on.

@@ -34,14 +34,21 @@ def ensure_bench(name: str) -> Path:
     return destination
 
 
-def load_bench_graph(name: str) -> tuple[Path, AssemblyGraph]:
-    """Build or reuse ``name`` and copy CFA coverage onto the compacted graph."""
+def load_bench_graph(name: str, *, namespaces: tuple[str, ...] | None = None) -> tuple[Path, AssemblyGraph]:
+    """Build or reuse ``name`` and copy CFA coverage onto the compacted graph.
+
+    ``namespaces`` keeps those colour layers from the MetaMetro ToCUMG.
+    """
+    from metametro.contracts.colour_filter import filter_colours
     from metametro.formats.cdbg.io import load_cdbg
     from metametro.formats.cfa.io import load_cfa
 
     root = ensure_bench(name)
     cfa = load_cfa(root / "cfa")
     cdbg = load_cdbg(root / "cdbg")
+    if namespaces:
+        cfa = filter_colours(cfa, namespaces=namespaces)
+        cdbg = filter_colours(cdbg, namespaces=namespaces)
     node_column = {row["node_id"]: float(row["coverage"]) for row in cfa.nodes if "coverage" in row}
     edge_column = {row["edge_id"]: float(row["coverage"]) for row in cfa.edges if "coverage" in row}
     node_coverage: dict[str, float] = {}
