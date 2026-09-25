@@ -13,8 +13,8 @@ dependencies:
   - pillow=11.3.0
   - pip
   - pip:
-      # Editable checkout: metametro reads VERSION two directories above the
-      # package (the repository root). A wheel leaves that file out, so import fails.
-      - "-e git+https://github.com/dsmutin/MetaMetro.git@ac4218954dde455b8604f79cd0f416425540bbdc#egg=metametro"
+      # MetaMetro 0.17.1 (312070a). Editable: a wheel omits VERSION, so import fails.
+      # https://github.com/dsmutin/metaMetro
+      - "-e git+https://github.com/dsmutin/metaMetro.git@312070ada1e310ff1ca321ff1e509debd9d05495#egg=metametro"
 variables:
   PYTHONPATH: src

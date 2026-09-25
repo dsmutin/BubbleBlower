@@ -24,7 +24,9 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
-          repository: dsmutin/MetaMetro
+          repository: dsmutin/metaMetro
+          # 0.17.1. The checkout has no data/bench; benchbuild --all fills it.
+          ref: 312070ada1e310ff1ca321ff1e509debd9d05495
           path: metametro
       - uses: conda-incubator/setup-miniconda@v3
         with:
@@ -32,11 +34,11 @@ jobs:
           auto-update-conda: true
           activate-environment: bubbleblower
           environment-file: environment.yml
+      - name: Install MetaMetro checkout
+        run: pip install -e metametro --no-deps
       - name: All pytest (mandatory and optional)
         timeout-minutes: 30
         run: pytest --tb=short
-      - name: Install MetaMetro checkout
-        run: pip install -e metametro --no-deps
       - name: Build the in-process benches the examples read
         run: metametro benchbuild --all
       - name: Toy example

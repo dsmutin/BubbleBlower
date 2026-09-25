@@ -12,6 +12,7 @@ Check a box only after mandatory tests pass. This is the implementation contract
 ## Edits and launch criteria
 
 - [x] Animate each resolution state on a pinned Fruchterman–Reingold layout (VERSION 0.10.2)
+- [x] Install MetaMetro 0.17.1 in the GitHub conda env (VERSION 0.10.3)
 - [ ] On each iteration, either merge two nodes that sit in one bubble or next to each other, unioning their colours, or split one node
 - [ ] A split partitions that node's colour: a binary 0/1 mask, or a gradual weight in `[0, 1]`, chosen by the method and by whether the colour channel is a mask or a score
 - [ ] A launch criterion chooses merge versus split. Bayesian criteria that exist today are posteriors only: `coverage` (Poisson, `coverage-poisson-1`) and `multimodal` (those coverage terms plus colour equality, long-read linkage, and k-mer support). They adjust a pop candidate. They do not choose merge versus split
