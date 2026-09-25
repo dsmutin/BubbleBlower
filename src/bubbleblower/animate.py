@@ -38,33 +38,46 @@ def fork_resolution_states(
     *,
     max_edits: int | None = None,
 ) -> tuple[list[AssemblyGraph], list[Edit]]:
-    """Split every node that still has two or more outgoing links.
+    """Split until every node has at most one incoming and one outgoing link.
 
-    One node is split per iteration. Each outgoing link becomes its own
-    group, and incoming links stay on the first group so they are not
-    copied. The loop stops when every remaining node has out-degree at most
-    one, or when ``max_edits`` splits have been accepted. Coverage must
-    already be present. This function does not fill it in.
+    One node is split per iteration. A node with several outgoing links is
+    split first: each outgoing link is its own group, and incoming links
+    stay on the first group so they are not copied. A node that only has
+    several incoming links is split the same way, and its single outgoing
+    link stays on the first group. The loop stops when no such node remains,
+    or when ``max_edits`` splits have been accepted. Coverage must already
+    be present. This function does not fill it in.
     """
     _require_coverage(graph)
     current = graph.copy()
     frames = [current.copy()]
     edits: list[Edit] = []
     skipped: set[str] = set()
-    limit = max_edits if max_edits is not None else max(len(current.cdbg.unitigs) * 3, 1)
+    limit = max_edits if max_edits is not None else max(len(current.cdbg.unitigs) * 4, 1)
     for _ in range(limit):
         outgoing, incoming = _incident_ids(current)
-        forks = sorted(
-            (node_id for node_id, links in outgoing.items() if len(links) >= 2 and node_id not in skipped),
-            key=lambda node_id: (-len(outgoing[node_id]), node_id),
-        )
+        forks = []
+        for node_id in outgoing:
+            if node_id in skipped:
+                continue
+            out_count = len(outgoing[node_id])
+            in_count = len(incoming[node_id])
+            if out_count >= 2 or in_count >= 2:
+                forks.append((-max(out_count, in_count), -out_count, node_id))
         if not forks:
             break
-        node_id = forks[0]
-        groups = [[link_id] for link_id in outgoing[node_id]]
-        extra = [link_id for link_id in incoming[node_id] if link_id not in outgoing[node_id]]
-        if extra:
-            groups[0] = groups[0] + extra
+        forks.sort()
+        node_id = forks[0][2]
+        out_links = outgoing[node_id]
+        in_links = [link_id for link_id in incoming[node_id] if link_id not in out_links]
+        if len(out_links) >= 2:
+            groups = [[link_id] for link_id in out_links]
+            if in_links:
+                groups[0] = groups[0] + in_links
+        else:
+            groups = [[link_id] for link_id in in_links]
+            if out_links:
+                groups[0] = groups[0] + out_links
         try:
             updated, edit = split_instance(current, node_id, groups)
         except (KeyError, ValueError):
@@ -156,10 +169,13 @@ def animate_states(
     namespace: str,
     seconds: float = 5.0,
     seed: int = 0,
+    hold_seconds: float = 0.0,
 ) -> Path:
-    """Write a GIF or MP4 of about ``seconds``.
+    """Write a GIF or MP4 of about ``seconds``, then hold the last frame.
 
     ``.gif`` uses Pillow. ``.mp4`` uses ffmpeg, an optional dependency.
+    ``hold_seconds`` repeats the settled final layout so the end state stays
+    on screen. It may be zero.
 
     Edge colour is one value of ``namespace`` (Set1). A link with several
     values of that namespace is Other. A link with none is Unclassified.
@@ -167,6 +183,8 @@ def animate_states(
     """
     if seconds <= 0:
         raise ValueError("seconds must be positive")
+    if hold_seconds < 0:
+        raise ValueError("hold_seconds must be non-negative")
     output = Path(path)
     if output.suffix.lower() not in {".gif", ".mp4"}:
         raise ValueError("animation path must be a .gif or a .mp4 file")
@@ -179,7 +197,15 @@ def animate_states(
     palette = _namespace_palette(frames[0], namespace)
     degree_limit = max(_degrees(frames[0]).values(), default=1.0)
     pictures = _tween(frames, edits, layouts, steps=_steps_per_edit(len(edits)))
-    _write_animation(pictures, palette, namespace, degree_limit, output, seconds=seconds)
+    _write_animation(
+        pictures,
+        palette,
+        namespace,
+        degree_limit,
+        output,
+        seconds=seconds,
+        hold_seconds=hold_seconds,
+    )
     if not output.is_file() or output.stat().st_size == 0:
         raise RuntimeError(f"animation was not written: {output}")
     return output
@@ -275,13 +301,44 @@ def _place_edit(
     parents = [node_id for node_id in edit.source_ids if node_id in positions]
     origin = _centroid(parents, positions) if parents else (0.0, 0.0)
     born = [node_id for node_id in after_ids if node_id not in placed]
+    born_set = set(born)
     for index, node_id in enumerate(born):
-        angle = 2.0 * math.pi * index / max(len(born), 1)
-        placed[node_id] = (origin[0] + 0.02 * math.cos(angle), origin[1] + 0.02 * math.sin(angle))
+        placed[node_id] = _birth_offset(after, node_id, origin, placed, born_set, index, len(born))
     free = set(born)
     free.update(_neighbours(after, set(edit.source_ids) | set(edit.target_ids) | set(born)))
     free &= set(placed)
     return _relax(placed, _edges(after), free)
+
+
+def _birth_offset(
+    after: AssemblyGraph,
+    node_id: str,
+    origin: tuple[float, float],
+    placed: dict[str, tuple[float, float]],
+    born: set[str],
+    index: int,
+    n_born: int,
+) -> tuple[float, float]:
+    """Place a new node part-way toward the neighbour that is unique to it."""
+    anchors = []
+    for link in after.cdbg.links:
+        other = link.target if link.source == node_id else link.source if link.target == node_id else None
+        if other is None or other == node_id or other in born or other not in placed:
+            continue
+        anchors.append(placed[other])
+    if not anchors:
+        angle = 2.0 * math.pi * index / max(n_born, 1)
+        return (origin[0] + 0.15 * math.cos(angle), origin[1] + 0.15 * math.sin(angle))
+    ax = sum(point[0] for point in anchors) / len(anchors)
+    ay = sum(point[1] for point in anchors) / len(anchors)
+    dx = ax - origin[0]
+    dy = ay - origin[1]
+    length = math.hypot(dx, dy) or 1.0
+    nudge = 0.05 * (index - (n_born - 1) / 2.0)
+    return (
+        origin[0] + 0.45 * dx + nudge * (-dy / length),
+        origin[1] + 0.45 * dy + nudge * (dx / length),
+    )
 
 
 def _centroid(node_ids: list[str], positions: dict[str, tuple[float, float]]) -> tuple[float, float]:
@@ -344,7 +401,7 @@ def _steps_per_edit(n_edits: int) -> int:
     if n_edits <= 0:
         return 1
     if n_edits > 40:
-        return 1
+        return 2
     return max(4, min(12, 150 // n_edits))
 
 
@@ -357,13 +414,13 @@ def _tween(
 ) -> list[tuple[AssemblyGraph, dict[str, tuple[float, float]]]]:
     if not edits:
         return [(frames[0], layouts[0])]
-    pictures: list[tuple[AssemblyGraph, dict[str, tuple[float, float]]]] = []
+    pictures: list[tuple[AssemblyGraph, dict[str, tuple[float, float]]]] = [(frames[0], layouts[0])]
     for before, after, edit, start, end in zip(
         frames[:-1], frames[1:], edits, layouts[:-1], layouts[1:], strict=True
     ):
         origin = _birth_positions(before, after, edit, start)
         for step in range(steps):
-            weight = step / max(steps - 1, 1)
+            weight = 1.0 if steps == 1 else step / (steps - 1)
             pictures.append((after, _lerp(origin, end, weight)))
     return pictures
 
@@ -447,6 +504,7 @@ def _write_animation(
     path: Path,
     *,
     seconds: float,
+    hold_seconds: float,
 ) -> None:
     import matplotlib
 
@@ -480,13 +538,15 @@ def _write_animation(
         fontsize=7,
         title_fontsize=8,
     )
-    fps = max(len(pictures) / seconds, 1.0)
+    fps = max(round(len(pictures) / seconds), 1)
+    hold_frames = round(hold_seconds * fps)
     if path.suffix.lower() == ".mp4":
         writer = FFMpegWriter(fps=fps, codec="libx264")
     else:
         writer = PillowWriter(fps=fps)
+    drawn = pictures + [pictures[-1]] * hold_frames
     with writer.saving(figure, str(path), dpi=120):
-        for graph, positions in pictures:
+        for graph, positions in drawn:
             axis.clear()
             order = [node_id for node_id in _ids(graph) if node_id in positions]
             coordinates = np.asarray([positions[node_id] for node_id in order], dtype=float)

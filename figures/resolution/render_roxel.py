@@ -1,8 +1,9 @@
 """Animate fork resolution of the MetaMetro roxel street graph.
 
-A fork is a unitig with two or more outgoing links. The simple-bubble
-detector only keeps pairs of paths that meet again, and roxel has a handful
-of those. This script splits every fork, one per iteration, until none remain.
+A fork is a unitig with two or more incoming links or two or more outgoing
+links. The simple-bubble detector only keeps pairs of paths that meet again,
+and roxel has a handful of those. This script splits every fork, one per
+iteration, until every node has at most one incoming link and one outgoing link.
 
 The CFA has no coverage column. Every unitig and every link is given
 coverage 1 so ``split_instance`` can run. That constant is not a measured
@@ -46,19 +47,38 @@ def _with_unit_coverage(graph):
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Load a roxel CFA, split every outgoing fork, and write the video."""
+    """Load a roxel CFA, split every fork, and write the video through the last state."""
     parser = argparse.ArgumentParser(description="Animate roxel fork resolution.")
     parser.add_argument("--cfa", type=Path, required=True, help="MetaMetro roxel CFA directory")
     parser.add_argument("--out", type=Path, required=True, help="GIF or MP4 path")
-    parser.add_argument("--seconds", type=float, default=8.0, help="animation length in seconds")
+    parser.add_argument(
+        "--seconds",
+        type=float,
+        default=None,
+        help="animation length in seconds; default is 0.25 seconds per edit",
+    )
     args = parser.parse_args(argv)
     if not args.cfa.is_dir():
         print(f"missing CFA directory: {args.cfa}", file=sys.stderr)
         return 2
     graph = _with_unit_coverage(from_cdbg(cfa_to_cdbg(load_cfa(args.cfa))))
     frames, edits = fork_resolution_states(graph)
-    print(f"edits {len(edits)} frames {len(frames)}", flush=True)
-    animate_states(frames, edits, args.out, namespace="type", seconds=args.seconds, seed=0)
+    seconds = args.seconds if args.seconds is not None else max(30.0, 0.25 * len(edits))
+    print(
+        f"edits {len(edits)} frames {len(frames)} "
+        f"nodes {len(frames[0].cdbg.unitigs)} -> {len(frames[-1].cdbg.unitigs)} "
+        f"seconds {seconds:.1f}",
+        flush=True,
+    )
+    animate_states(
+        frames,
+        edits,
+        args.out,
+        namespace="type",
+        seconds=seconds,
+        seed=0,
+        hold_seconds=4.0,
+    )
     print(f"wrote {args.out}")
     return 0
 

@@ -67,8 +67,36 @@ def test_fork_resolution_splits_every_outgoing_fork() -> None:
     assert len(frames) == 3
     from bubbleblower.animate import _incident_ids
 
-    outgoing, _incoming = _incident_ids(frames[-1])
+    outgoing, incoming = _incident_ids(frames[-1])
     assert all(len(links) <= 1 for links in outgoing.values())
+    assert all(len(links) <= 1 for links in incoming.values())
+
+
+def test_fork_resolution_splits_an_incoming_junction() -> None:
+    """A node with two incoming links and one outgoing link is split too."""
+    graph = records_to_tocumg(
+        graph_id="in_fork",
+        colors=[{"color_id": "0", "namespace": "type", "value": "residential"}],
+        nodes=[
+            {"id": "A", "sequence": "AAAAAA", "colors": [0], "coverage": 1.0},
+            {"id": "B", "sequence": "CCCCCC", "colors": [0], "coverage": 1.0},
+            {"id": "S", "sequence": "GGGGGG", "colors": [0], "coverage": 1.0},
+            {"id": "T", "sequence": "TTTTTT", "colors": [0], "coverage": 1.0},
+        ],
+        links=[
+            {"id": "eAS", "source": "A", "target": "S", "colors": [0], "coverage": 1.0},
+            {"id": "eBS", "source": "B", "target": "S", "colors": [0], "coverage": 1.0},
+            {"id": "eST", "source": "S", "target": "T", "colors": [0], "coverage": 1.0},
+        ],
+    )
+    frames, edits = fork_resolution_states(graph)
+    assert len(edits) == 1
+    assert len(frames) == 2
+    from bubbleblower.animate import _incident_ids
+
+    outgoing, incoming = _incident_ids(frames[-1])
+    assert all(len(links) <= 1 for links in outgoing.values())
+    assert all(len(links) <= 1 for links in incoming.values())
 
 
 def test_relax_leaves_a_distant_node_fixed() -> None:

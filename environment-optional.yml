@@ -1,0 +1,8 @@
+# Optional packages. `conda env create -f environment.yml` does not install these.
+# MP4 resolution videos need ffmpeg. Without it, animate_states still writes GIF.
+name: bubbleblower-optional
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - ffmpeg=4.4.0=hca11adc_2
