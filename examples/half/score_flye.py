@@ -17,7 +17,9 @@ sys.path.insert(0, str(ROOT / "src"))
 from bubbleblower.assembly_metrics import quast_like  # noqa: E402
 from bubbleblower.colour_break import break_read_colour_chimeras  # noqa: E402
 
-MINIMAP = "/mnt/tank/scratch/dsmutin/partition-metagenomics/envs/vaegbin_env/bin/minimap2"
+from bench_paths import minimap2, work_dir  # noqa: E402
+
+MINIMAP = minimap2()
 WORK = ROOT / "examples" / "half" / "work"
 
 

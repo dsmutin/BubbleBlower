@@ -22,9 +22,10 @@ from bubbleblower.debubblers import DEBUBBLERS, classify_debubble, resolve_debub
 from bubbleblower.detect import detect_bubbles  # noqa: E402
 from bubbleblower.gfa import load_gfa  # noqa: E402
 
-MINIMAP = "/mnt/tank/scratch/dsmutin/partition-metagenomics/envs/vaegbin_env/bin/minimap2"
+from bench_paths import minimap2, work_dir  # noqa: E402
+
+MINIMAP = minimap2()
 WORK = ROOT / "examples" / "half" / "work"
-EX = Path("/mnt/tank/scratch/partition-metagenomics/smuteam/vaegbin_improved/examples")
 
 
 def decision_counts(graph, name: str) -> dict[str, int]:
@@ -91,8 +92,8 @@ def main() -> int:
         "low75": (
             WORK / "bench" / "low75_keep" / "assembly_graph_after_simplification.gfa",
             [
-                EX / "low75" / "work" / "iss" / "initial" / "sample_full_R1.fastq",
-                EX / "low75" / "work" / "iss" / "initial" / "sample_full_R2.fastq",
+                work_dir("low75") / "iss" / "initial" / "sample_full_R1.fastq",
+                work_dir("low75") / "iss" / "initial" / "sample_full_R2.fastq",
             ],
             WORK / "bench" / "low75_pop" / "contigs.fasta",
             WORK / "megahit_k21" / "low75.references.fna",
@@ -100,8 +101,8 @@ def main() -> int:
         "half_strains_k55": (
             WORK / "metaspades_nobulge" / "assembly_graph_after_simplification.gfa",
             [
-                EX / "half_strains" / "work" / "iss" / "initial" / "sample_full_R1.fastq",
-                EX / "half_strains" / "work" / "iss" / "initial" / "sample_full_R2.fastq",
+                work_dir("half_strains") / "iss" / "initial" / "sample_full_R1.fastq",
+                work_dir("half_strains") / "iss" / "initial" / "sample_full_R2.fastq",
             ],
             WORK / "metaspades" / "contigs.fasta",
             WORK / "megahit_k21" / "half_strains.references.fna",

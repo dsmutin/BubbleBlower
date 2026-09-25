@@ -18,8 +18,9 @@ sys.path.insert(0, str(ROOT / "src"))
 from bubbleblower.assembly_metrics import quast_like  # noqa: E402
 from bubbleblower.colour_break import break_read_colour_chimeras  # noqa: E402
 
-EX = Path("/mnt/tank/scratch/partition-metagenomics/smuteam/vaegbin_improved/examples")
-MINIMAP = "/mnt/tank/scratch/dsmutin/partition-metagenomics/envs/vaegbin_env/bin/minimap2"
+from bench_paths import minimap2, work_dir  # noqa: E402
+
+MINIMAP = minimap2()
 
 
 def read_fasta(path: Path) -> list[tuple[str, str]]:
@@ -50,11 +51,11 @@ def main() -> int:
     if dest.is_file():
         payload = json.loads(dest.read_text(encoding="utf-8"))
     for name in names:
-        k21 = EX / name / "work" / "megahit" / "intermediate_contigs" / "k21.contigs.fa"
-        final = EX / name / "work" / "megahit" / "final.contigs.fa"
+        k21 = work_dir(name) / "megahit" / "intermediate_contigs" / "k21.contigs.fa"
+        final = work_dir(name) / "megahit" / "final.contigs.fa"
         reads = [
-            EX / name / "work" / "iss" / "initial" / "sample_full_R1.fastq",
-            EX / name / "work" / "iss" / "initial" / "sample_full_R2.fastq",
+            work_dir(name) / "iss" / "initial" / "sample_full_R1.fastq",
+            work_dir(name) / "iss" / "initial" / "sample_full_R2.fastq",
         ]
         ref = ROOT / "examples" / "half" / "work" / "megahit_k21" / f"{name}.references.fna"
         for path in (k21, final, *reads, ref):

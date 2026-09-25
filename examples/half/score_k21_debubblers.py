@@ -1,11 +1,10 @@
 #!/usr/bin/env python3
 """Run both graph debubblers on MEGAHIT k21 FASTG and score the unitigs.
 
-The FASTG is ``contig2fastg 21`` of ``k21.contigs.fa``. Forward links whose
-sequences share a (k-1) suffix/prefix get that overlap, so same-colour
-compaction can join them. Reverse-strand links keep a missing overlap and
-are not concatenated. Unitig sequences are scored against the final MEGAHIT
-contigs. Read colours come from the example's Illumina FASTQ.
+The FASTG is ``contig2fastg 21`` of ``k21.contigs.fa``. MetaMetro compacts
+it into a ToCUMG and keeps the assembly overlap. Unitig sequences are scored
+against the final MEGAHIT contigs. Read colours come from the example's
+Illumina FASTQ.
 """
 
 from __future__ import annotations
@@ -24,25 +23,10 @@ from bubbleblower.debubblers import DEBUBBLERS, classify_debubble, resolve_debub
 from bubbleblower.detect import detect_bubbles  # noqa: E402
 from bubbleblower.fastg import load_fastg  # noqa: E402
 
-EX = Path("/mnt/tank/scratch/partition-metagenomics/smuteam/vaegbin_improved/examples")
-MINIMAP = "/mnt/tank/scratch/dsmutin/partition-metagenomics/envs/vaegbin_env/bin/minimap2"
+from bench_paths import minimap2, work_dir  # noqa: E402
+
+MINIMAP = minimap2()
 K = 21
-
-
-def assign_forward_overlaps(graph, k: int = K) -> int:
-    """Store a (k-1) overlap on forward links that actually share it."""
-    overlap = k - 1
-    sequences = {unitig.unitig_id: unitig.sequence for unitig in graph.cdbg.unitigs}
-    matched = 0
-    for link in graph.cdbg.links:
-        if link.orientation != "++":
-            continue
-        left = sequences[link.source]
-        right = sequences[link.target]
-        if len(left) >= overlap and len(right) >= overlap and left[-overlap:] == right[:overlap]:
-            link.overlap = overlap
-            matched += 1
-    return matched
 
 
 def colour_bubble_unitigs(graph, fastq_paths: list[Path], *, k: int = K, min_depth: int = 2) -> int:
@@ -140,18 +124,18 @@ def main() -> int:
         payload = json.loads(dest.read_text(encoding="utf-8"))
     for name in names:
         fastg = ROOT / "examples" / "half" / "work" / "megahit_k21" / f"{name}.k21.fastg"
-        final = EX / name / "work" / "megahit" / "final.contigs.fa"
+        final = work_dir(name) / "megahit" / "final.contigs.fa"
         reads = [
-            EX / name / "work" / "iss" / "initial" / "sample_full_R1.fastq",
-            EX / name / "work" / "iss" / "initial" / "sample_full_R2.fastq",
+            work_dir(name) / "iss" / "initial" / "sample_full_R1.fastq",
+            work_dir(name) / "iss" / "initial" / "sample_full_R2.fastq",
         ]
         ref = ROOT / "examples" / "half" / "work" / "megahit_k21" / f"{name}.references.fna"
         for path in (fastg, final, *reads, ref):
             if not path.is_file():
                 raise SystemExit(f"missing {path}")
         print("loading", name, flush=True)
-        graph = load_fastg(fastg, graph_id=name)
-        matched = assign_forward_overlaps(graph)
+        graph = load_fastg(fastg, k=K, graph_id=name)
+        matched = sum(1 for link in graph.cdbg.links if link.overlap is not None)
         print("overlaps", matched, "links", len(graph.cdbg.links), flush=True)
         print("colouring bubbles", name, flush=True)
         painted = colour_bubble_unitigs(graph, reads)

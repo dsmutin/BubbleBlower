@@ -17,14 +17,15 @@ sys.path.insert(0, str(ROOT / "src"))
 
 from bubbleblower.assembly_metrics import quast_like  # noqa: E402
 
-EXAMPLES = Path("/mnt/tank/scratch/partition-metagenomics/smuteam/vaegbin_improved/examples")
-MINIMAP = "/mnt/tank/scratch/dsmutin/partition-metagenomics/envs/vaegbin_env/bin/minimap2"
+from bench_paths import minimap2, work_dir  # noqa: E402
+
+MINIMAP = minimap2()
 DATASETS = ("half_strains", "low75", "low75half", "high100", "heldout_genera")
 
 
 def write_references(dataset: str, dest: Path) -> None:
     """Concatenate simulated genomes. Skip files that are not FASTA."""
-    sim = EXAMPLES / dataset / "work" / "sim"
+    sim = work_dir(dataset) / "sim"
     if not sim.is_dir():
         raise FileNotFoundError(sim)
     chunks: list[str] = []
@@ -41,7 +42,7 @@ def write_references(dataset: str, dest: Path) -> None:
 
 def score_dataset(dataset: str) -> dict:
     """Return metric dicts for k21 contigs and final contigs."""
-    work = EXAMPLES / dataset / "work" / "megahit"
+    work = work_dir(dataset) / "megahit"
     k21 = work / "intermediate_contigs" / "k21.contigs.fa"
     final = work / "final.contigs.fa"
     if not k21.is_file() or not final.is_file():

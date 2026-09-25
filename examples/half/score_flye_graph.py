@@ -21,7 +21,9 @@ from bubbleblower.debubblers import DEBUBBLERS, classify_debubble, resolve_debub
 from bubbleblower.detect import detect_bubbles  # noqa: E402
 from bubbleblower.gfa import load_gfa  # noqa: E402
 
-MINIMAP = "/mnt/tank/scratch/dsmutin/partition-metagenomics/envs/vaegbin_env/bin/minimap2"
+from bench_paths import minimap2, work_dir  # noqa: E402
+
+MINIMAP = minimap2()
 WORK = ROOT / "examples" / "half" / "work"
 
 
