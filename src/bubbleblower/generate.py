@@ -1,14 +1,54 @@
 """Deterministic graph-only bubble benchmark.
 
 Ground truth is written beside the graph and is not read by the resolver.
-The graph itself is built by MetaMetro ``bubble_strain_3_n50``.
 """
 
 from __future__ import annotations
 
+import math
+import random
 from pathlib import Path
 
-from bubbleblower.graph import AssemblyGraph, adopt_cfa
+from bubbleblower.graph import AssemblyGraph
+
+try:
+    from bubbleblower.graph import build_graph
+except ImportError:
+    from bubbleblower.graph import records_to_tocumg as build_graph
+
+
+def _poisson(rng: random.Random, lam: float) -> int:
+    if lam <= 0:
+        return 0
+    limit = math.exp(-lam)
+    count = 0
+    product = 1.0
+    while product > limit:
+        count += 1
+        product *= rng.random()
+    return count - 1
+
+
+def _tag(index: int) -> str:
+    """Encode ``index`` as a short unique ACGT word so bubble signatures differ."""
+    alphabet = "ACGT"
+    digits: list[str] = []
+    value = index + 1
+    while value:
+        digits.append(alphabet[value % 4])
+        value //= 4
+    return "".join(digits) or "A"
+
+
+def _band(rng: random.Random, kind: str) -> float:
+    spans = {
+        "very_low": (0.2, 1.0),
+        "medium": (1.0, 3.0),
+        "borderline": (3.0, 7.0),
+        "hard": (7.0, 12.0),
+    }
+    low, high = spans[kind]
+    return rng.uniform(low, high)
 
 
 def generate_bubble_benchmark(
@@ -22,20 +62,121 @@ def generate_bubble_benchmark(
 ) -> tuple[AssemblyGraph, list[dict[str, str]]]:
     """Build ``n_bubbles`` disjoint bubbles and a ground-truth table.
 
-    Sequences and the retain/pop labels come from MetaMetro. This function
-    adopts the compacted graph and rewrites truth ids to unitig ids.
+    ``error_rate`` scales the Poisson mean of an error branch on top of the
+    band draw, so the same seed stays reproducible.
     """
-    from metametro.bench.data.universal.bubbles import synthetic_bubbles
-
-    cfa, truth = synthetic_bubbles(
-        n_strains=n_strains,
-        n_bubbles=n_bubbles,
-        n_error_bubbles=n_error_bubbles,
-        abundance=abundance,
-        error_rate=error_rate,
-        seed=seed,
-    )
-    graph = adopt_cfa(cfa)
+    if n_error_bubbles > n_bubbles:
+        raise ValueError("n_error_bubbles cannot exceed n_bubbles")
+    if len(abundance) < n_strains:
+        raise ValueError("abundance must cover every strain")
+    rng = random.Random(seed)
+    n_bio = n_bubbles - n_error_bubbles
+    plan: list[tuple[str, tuple]] = []
+    pairs = [(0, 1), (1, 2), (0, 2)]
+    for index in range(min(10, n_bio)):
+        plan.append(("strain", pairs[index % len(pairs)]))
+    for index in range(min(10, max(0, n_bio - 10))):
+        owner = index % n_strains
+        other = (owner + 1) % n_strains
+        plan.append(("strain", (owner, other)))
+    three = tuple(range(n_strains))
+    while len(plan) < n_bio:
+        plan.append(("strain", three))
+    error_kinds = (["very_low"] * 10) + (["medium"] * 8) + (["borderline"] * 5) + (["hard"] * 2)
+    for index in range(n_error_bubbles):
+        kind = error_kinds[index] if index < len(error_kinds) else "medium"
+        plan.append(("error", (index % n_strains, kind)))
+    nodes: list[dict] = []
+    links: list[dict] = []
+    truth: list[dict[str, str]] = []
+    for index, (kind, spec) in enumerate(plan):
+        bubble_id = f"B{index + 1:03d}"
+        source = f"{bubble_id}S"
+        sink = f"{bubble_id}T"
+        if kind == "strain":
+            strains = tuple(int(item) for item in spec)
+            coverages = [float(_poisson(rng, abundance[strain])) for strain in strains]
+            coverages = [max(value, 1.0) for value in coverages]
+            expected = "retain"
+            strain_names = [f"strain_{chr(ord('A') + strain)}" for strain in strains]
+        else:
+            owner = int(spec[0])
+            band = str(spec[1])
+            true_cov = float(max(_poisson(rng, abundance[owner]), 1))
+            error_cov = max(_band(rng, band), error_rate * true_cov)
+            strains = (owner, owner)
+            coverages = [true_cov, error_cov]
+            expected = "pop"
+            strain_names = [f"strain_{chr(ord('A') + owner)}"]
+        source_cov = sum(coverages)
+        tag = _tag(index)
+        nodes.append(
+            {
+                "id": source,
+                "sequence": f"ACGT{'AC' * (index % 5)}TT{tag}",
+                "colors": sorted({int(item) for item in strains}),
+                "coverage": source_cov,
+            }
+        )
+        nodes.append(
+            {
+                "id": sink,
+                "sequence": f"GGCC{'GG' * (index % 4)}AA{tag}",
+                "colors": sorted({int(item) for item in strains}),
+                "coverage": source_cov,
+            }
+        )
+        branch_ids: list[str] = []
+        for branch_index, (strain, coverage) in enumerate(zip(strains, coverages)):
+            branch_id = f"{bubble_id}{chr(ord('A') + branch_index)}"
+            branch_ids.append(branch_id)
+            base = "ATGC" if kind == "strain" else "ACGT"[branch_index % 4] * 4
+            sequence = (base * 4)[: 8 + branch_index] + f"{index:02d}"[-2:]
+            sequence = "".join(ch if ch in "ACGT" else "A" for ch in sequence)
+            if len(sequence) < 6:
+                sequence = (sequence + "ACGTAC")[:6]
+            nodes.append(
+                {
+                    "id": branch_id,
+                    "sequence": sequence + tag + ("A" if branch_index == 0 else "C" * branch_index),
+                    "colors": [int(strain)],
+                    "coverage": coverage,
+                }
+            )
+            links.append(
+                {
+                    "id": f"{bubble_id}s{branch_index}",
+                    "source": source,
+                    "target": branch_id,
+                    "colors": [int(strain)],
+                    "coverage": coverage,
+                }
+            )
+            links.append(
+                {
+                    "id": f"{bubble_id}t{branch_index}",
+                    "source": branch_id,
+                    "target": sink,
+                    "colors": [int(strain)],
+                    "coverage": coverage,
+                }
+            )
+        truth.append(
+            {
+                "bubble_id": bubble_id,
+                "type": "error" if kind == "error" else "strain",
+                "strain_ids": ",".join(strain_names),
+                "source_id": source,
+                "sink_id": sink,
+                "branch_ids": ",".join(branch_ids),
+                "expected_action": expected,
+            }
+        )
+    colors = [
+        {"color_id": str(index), "namespace": "taxon", "value": f"strain_{chr(ord('A') + index)}"}
+        for index in range(n_strains)
+    ]
+    graph = build_graph(graph_id=f"benchmark-{seed}", nodes=nodes, links=links, colors=colors)
     graph.coverage_source = "simulated_poisson"
     unitig_of = {
         member: unitig.unitig_id

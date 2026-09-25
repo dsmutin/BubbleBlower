@@ -12,22 +12,23 @@ _METAMETRO = ROOT.parent / "metametro" / "src"
 if _METAMETRO.is_dir():
     sys.path.insert(0, str(_METAMETRO))
 
-from bubbleblower.fixtures import error_bubble  # noqa: E402
+from bubbleblower.bench_input import load_bench_graph  # noqa: E402
 from bubbleblower.report import write_result  # noqa: E402
 from bubbleblower.search import greedy_search  # noqa: E402
 
 
 def run() -> int:
-    """Resolve the sequencing-error bubble and require the error node to be gone."""
-    result = greedy_search(error_bubble(), max_iterations=5)
+    """Resolve the sequencing-error bubble from MetaMetro and require the error node to be gone."""
+    _root, graph = load_bench_graph("bubble_error_1")
+    result = greedy_search(graph, max_iterations=5)
     out = Path(__file__).resolve().parent / "data"
     write_result(result, out)
-    ids = {unitig.unitig_id for unitig in result.graph.cdbg.unitigs}
+    members = result.graph.member_ids()
     payload = {
         "score_before": result.scores[0].total,
         "score_after": result.scores[-1].total,
-        "removed_error_branch": "E" not in ids,
-        "kept_true_branch": "A" in ids,
+        "removed_error_branch": "E" not in members,
+        "kept_true_branch": "A" in members,
     }
     (out / "summary.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, indent=2))

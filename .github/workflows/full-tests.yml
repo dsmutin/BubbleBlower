@@ -22,6 +22,10 @@ jobs:
         shell: bash -l {0}
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: dsmutin/MetaMetro
+          path: metametro
       - uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: "3.12"
@@ -31,6 +35,10 @@ jobs:
       - name: All pytest (mandatory and optional)
         timeout-minutes: 30
         run: pytest --tb=short
+      - name: Install MetaMetro checkout
+        run: pip install -e metametro --no-deps
+      - name: Build the in-process benches the examples read
+        run: metametro benchbuild --all
       - name: Toy example
         timeout-minutes: 15
         run: python examples/toy/run.py

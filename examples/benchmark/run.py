@@ -13,11 +13,11 @@ _METAMETRO = ROOT.parent / "metametro" / "src"
 if _METAMETRO.is_dir():
     sys.path.insert(0, str(_METAMETRO))
 
+from bubbleblower.bench_input import load_bench_graph  # noqa: E402
 from bubbleblower.classify import classify_bubble  # noqa: E402
 from bubbleblower.detect import detect_bubbles  # noqa: E402
 from bubbleblower.evaluate import classification_metrics, resolution_metrics  # noqa: E402
 from bubbleblower.features import extract_features  # noqa: E402
-from bubbleblower.generate import generate_bubble_benchmark, write_ground_truth  # noqa: E402
 from bubbleblower.report import write_result  # noqa: E402
 from bubbleblower.search import greedy_search  # noqa: E402
 
@@ -26,10 +26,21 @@ AMBER_F1_MIN = 0.85
 
 
 def run() -> int:
-    """Write ground truth, classify, resolve, and require AMBER F1."""
-    graph, truth = generate_bubble_benchmark(seed=42)
+    """Score the MetaMetro 50-bubble build. Primary quality metric is AMBER F1."""
+    root, graph = load_bench_graph("bubble_strain_3_n50")
+    from metametro.tables import read_tsv
+
+    _header, truth = read_tsv(root / "ground_truth" / "bubbles.tsv")
+    unitig_of = {
+        member: unitig.unitig_id
+        for unitig in graph.cdbg.unitigs
+        for member in unitig.members
+    }
+    for row in truth:
+        row["source_id"] = unitig_of[row["source_id"]]
+        row["sink_id"] = unitig_of[row["sink_id"]]
+        row["branch_ids"] = ",".join(unitig_of[branch] for branch in row["branch_ids"].split(","))
     out = Path(__file__).resolve().parent / "data"
-    write_ground_truth(truth, out / "ground_truth" / "bubbles.tsv")
     by_source = {bubble.source: bubble for bubble in detect_bubbles(graph)}
     rows = []
     table = ["bubble_id\ttype\tdecision\tp_error\tp_strain"]
