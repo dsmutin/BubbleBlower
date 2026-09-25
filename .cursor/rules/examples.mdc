@@ -1,0 +1,25 @@
+---
+description: Examples are MetaMetro benches. Build them there; do not commit local copies.
+alwaysApply: true
+---
+
+# Examples live in MetaMetro
+
+Example graphs, reads, colourings, and ground truth live in **MetaMetro 0.17.1** (`312070ada1e310ff1ca321ff1e509debd9d05495`, https://github.com/dsmutin/metaMetro). They do not live in this repository.
+
+Build them from that checkout. A fresh checkout has an empty `data/bench`; `benchbuild` fills it:
+
+```bash
+metametro benchbuild --all
+metametro benchbuild bubble_strain_2
+```
+
+BubbleBlower only runs a loader against that build:
+
+```python
+load_bench_graph("bubble_strain_2", namespaces=("taxon",))
+```
+
+Do not commit the build. That includes MetaMetro `data/bench/` and a second copy under `examples/*/data` (CFA, CDBG, unitigs, links, reads, ground truth, or metrics written from a local bench). If the bench directory is missing, run `benchbuild`. Do not paste a local graph in its place.
+
+A tiny graph that exists only inside one test file may stay in that test. It is not an example.

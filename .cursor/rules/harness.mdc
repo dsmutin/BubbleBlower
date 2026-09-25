@@ -20,6 +20,7 @@ alwaysApply: true
 - benchmarks
 - taxon-identity
 - colourings
+- examples
 
 User-level publication-figures applies when producing plots.
 

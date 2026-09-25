@@ -59,6 +59,10 @@ conda activate bubbleblower
 
 Never `git push` unless the human explicitly asks. CI runs on GitHub after they push.
 
+## Examples
+
+Examples live in MetaMetro 0.17.1, not in this repository. Build them there (`metametro benchbuild --all`, or one bench name). A fresh MetaMetro checkout has an empty `data/bench`; that command fills it. Do not commit `data/bench/` or a local copy under `examples/*/data`. Runners in `examples/*/run.py` only load the build with `load_bench_graph`. A graph that exists only inside a test file is a test, not an example.
+
 ## Benchmarks
 
 Do not add a new benchmark or pinned community in this repository. Add it in MetaMetro (`metametro benchbuild`) and open a pull request there. This package reads that build.
