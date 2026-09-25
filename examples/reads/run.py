@@ -30,12 +30,16 @@ def run() -> int:
     truth_lines = (root / "ground_truth" / "read_to_genome.tsv").read_text(encoding="utf-8").splitlines()
     n_reads = sum(1 for line in truth_lines if line.strip()) - 1
     bubbles = detect_bubbles(graph)
+    samples = sorted(
+        str(row["value"]) for row in (cfa.colors or []) if row.get("namespace") == "sample"
+    )
     payload = {
         "n_reads": n_reads,
         "n_cfa_nodes": len(cfa.nodes),
         "n_unitigs": len(graph.cdbg.unitigs),
         "n_bubbles": len(bubbles),
         "n_colours": len(cfa.colors or []),
+        "sample_colours": samples,
         "coverage_source": graph.coverage_source,
         "graph_source": "metametro.benchbuild bubble_reads_2",
     }
@@ -43,7 +47,7 @@ def run() -> int:
     out.mkdir(parents=True, exist_ok=True)
     (out / "summary.json").write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, indent=2))
-    if payload["n_reads"] != 40 or payload["n_colours"] != 2 or payload["n_unitigs"] < 1:
+    if payload["n_reads"] != 40 or samples != ["sample_A", "sample_B"] or payload["n_unitigs"] < 1:
         return 1
     if graph.cdbg.metadata.get("contract") != "cfa_to_cdbg":
         return 1

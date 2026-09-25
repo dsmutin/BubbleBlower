@@ -27,7 +27,7 @@ AMBER_F1_MIN = 0.85
 
 def run() -> int:
     """Score the MetaMetro 50-bubble build. Primary quality metric is AMBER F1."""
-    root, graph = load_bench_graph("bubble_strain_3_n50")
+    root, graph = load_bench_graph("bubble_strain_3_n50", namespaces=("taxon",))
     from metametro.tables import read_tsv
 
     _header, truth = read_tsv(root / "ground_truth" / "bubbles.tsv")

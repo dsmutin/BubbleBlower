@@ -19,7 +19,7 @@ from bubbleblower.pipeline import summarize  # noqa: E402
 
 def run() -> int:
     """Classify the MetaMetro two-taxon bubble and require a strain decision."""
-    _root, graph = load_bench_graph("bubble_strain_2")
+    _root, graph = load_bench_graph("bubble_strain_2", namespaces=("taxon",))
     summary = summarize(graph)
     decision = summary["bubbles"][0]["decision"] if summary["bubbles"] else None
     payload = {
