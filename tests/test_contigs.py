@@ -5,13 +5,13 @@ from __future__ import annotations
 import pytest
 
 from bubbleblower.contigs import contig_sequences
-from bubbleblower.graph import build_graph
+from bubbleblower.graph import records_to_tocumg
 
 pytestmark = pytest.mark.mandatory
 
 
 def _graph(links: list[dict]) -> object:
-    return build_graph(
+    return records_to_tocumg(
         graph_id="walk",
         colors=[{"color_id": "0", "namespace": "taxon", "value": "taxon_1"}],
         nodes=[

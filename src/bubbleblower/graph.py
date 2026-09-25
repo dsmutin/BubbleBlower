@@ -11,8 +11,13 @@ import hashlib
 import re
 from dataclasses import dataclass, field
 
-from metametro.formats.cdbg.model import SCHEMA_VERSION, Cdbg, Link, NodeMap, Unitig
+from metametro.converters.cdbg_to_cgt import cdbg_to_cgt
+from metametro.converters.cfa_to_cdbg import cfa_to_cdbg
+from metametro.formats.cdbg.model import Cdbg, Unitig
 from metametro.formats.cdbg.validator import validate_cdbg
+from metametro.formats.cfa.model import CfaGraph
+from metametro.formats.cgt.model import Cgt
+from metametro.identity import assert_cgt_matches_cdbg
 
 _COV = re.compile(r"_cov_([0-9]+(?:\.[0-9]+)?)")
 
@@ -42,6 +47,17 @@ class AssemblyGraph:
             if unitig.unitig_id == unitig_id:
                 return unitig
         raise KeyError(unitig_id)
+
+    def unitig_id_for_member(self, cfa_node_id: str) -> str:
+        """Return the ToCUMG unitig that contains one CFA node id."""
+        hits = [unitig.unitig_id for unitig in self.cdbg.unitigs if cfa_node_id in unitig.members]
+        if len(hits) != 1:
+            raise KeyError(cfa_node_id)
+        return hits[0]
+
+    def member_ids(self) -> set[str]:
+        """CFA node ids stored on this ToCUMG. Unitig ids are MetaMetro's."""
+        return {member for unitig in self.cdbg.unitigs for member in unitig.members}
 
     def link(self, link_id: str) -> Link:
         for link in self.cdbg.links:
@@ -133,77 +149,125 @@ def from_cdbg(
     return graph
 
 
-def build_graph(
+def _column(rows: list[dict[str, str]], name: str) -> dict[str, str] | None:
+    if not rows or name not in rows[0]:
+        return None
+    key = "node_id" if "node_id" in rows[0] else "edge_id"
+    return {row[key]: row[name] for row in rows}
+
+
+def adopt_cfa(cfa: CfaGraph) -> AssemblyGraph:
+    """Wrap the ToCUMG that MetaMetro compacts from ``cfa``.
+
+    Unitig ids come from ``cfa_to_cdbg``. This function does not invent nodes
+    or links. A ``coverage`` column, when the CFA declares one, is copied onto
+    unitigs (mean of member nodes) and onto links. A link with no coverage
+    column takes the source unitig's coverage.
+    """
+    cdbg = cfa_to_cdbg(cfa)
+    node_column = _column(cfa.nodes, "coverage")
+    edge_column = _column(cfa.edges, "coverage")
+    node_coverage: dict[str, float] = {}
+    if node_column is not None:
+        for unitig in cdbg.unitigs:
+            values = [float(node_column[member]) for member in unitig.members]
+            node_coverage[unitig.unitig_id] = sum(values) / len(values)
+    link_coverage: dict[str, float] = {}
+    if edge_column is not None:
+        for link in cdbg.links:
+            if link.link_id in edge_column:
+                link_coverage[link.link_id] = float(edge_column[link.link_id])
+    if node_coverage and len(link_coverage) != len(cdbg.links):
+        for link in cdbg.links:
+            link_coverage.setdefault(link.link_id, node_coverage[link.source])
+    graph = from_cdbg(
+        cdbg,
+        node_coverage or None,
+        link_coverage or None,
+    )
+    if node_coverage:
+        graph.coverage_source = "cfa_coverage_column"
+    graph.validate()
+    return graph
+
+
+def from_cgt(cgt: Cgt, cdbg: Cdbg) -> AssemblyGraph:
+    """Bind a graph tensor to the ToCUMG it was built from.
+
+    The tensor is checked against that ToCUMG and is not turned into a second
+    graph. Topology, sequences, and colours stay on the ToCUMG.
+    """
+    assert_cgt_matches_cdbg(cgt, cdbg)
+    return from_cdbg(cdbg)
+
+
+def as_cgt(graph: AssemblyGraph) -> Cgt:
+    """Tensor view of an existing ToCUMG. Colours stay off the feature matrix."""
+    return cdbg_to_cgt(graph.cdbg)
+
+
+def _color_set(colors: list[int]) -> str:
+    return ",".join(str(color) for color in colors)
+
+
+def records_to_tocumg(
     *,
     graph_id: str,
     nodes: list[dict],
     links: list[dict],
     colors: list[dict[str, str]],
 ) -> AssemblyGraph:
-    """Build an identity-compaction CDBG from plain node and link records.
+    """Hand node and link records to MetaMetro and adopt the compacted ToCUMG.
 
-    Each node dict has ``id``, ``sequence``, ``colors``, and ``coverage``.
-    Each link dict has ``id``, ``source``, ``target``, ``colors``, and ``coverage``.
+    Records are a CFA. ``cfa_to_cdbg`` assigns unitig ids. There is no overlap
+    column, so compaction stays one unitig per CFA node.
     """
-    unitigs: list[Unitig] = []
-    mapping: list[NodeMap] = []
-    node_coverage: dict[str, float] = {}
-    for node in nodes:
-        unitig_id = str(node["id"])
-        sequence = str(node["sequence"])
-        color_ids = [int(color) for color in node["colors"]]
-        cfa_id = str(node.get("cfa_id", unitig_id))
-        unitigs.append(
-            Unitig(
-                unitig_id=unitig_id,
-                sequence=sequence,
-                members=[cfa_id],
-                color_ids=color_ids,
-            )
-        )
-        mapping.append(
-            NodeMap(
-                cfa_node_id=cfa_id,
-                unitig_id=unitig_id,
-                ordinal=0,
-                length=len(sequence),
-                color_ids=list(color_ids),
-            )
-        )
-        node_coverage[unitig_id] = float(node["coverage"])
-    link_rows: list[Link] = []
-    link_coverage: dict[str, float] = {}
-    for link in links:
-        link_id = str(link["id"])
-        color_ids = [int(color) for color in link["colors"]]
-        link_rows.append(
-            Link(
-                link_id=link_id,
-                source=str(link["source"]),
-                target=str(link["target"]),
-                orientation=link.get("orientation", "++"),
-                color_ids=color_ids,
-            )
-        )
-        link_coverage[link_id] = float(link["coverage"])
-    cdbg = Cdbg(
+    if not nodes:
+        raise ValueError("a ToCUMG needs at least one CFA node")
+    sequences = {str(node["id"]): str(node["sequence"]) for node in nodes}
+    node_rows = [
+        {
+            "node_id": str(node["id"]),
+            "coverage": str(float(node["coverage"])),
+            "color_set": _color_set([int(color) for color in node["colors"]]),
+        }
+        for node in nodes
+    ]
+    edge_rows = [
+        {
+            "edge_id": str(link["id"]),
+            "source": str(link["source"]),
+            "target": str(link["target"]),
+            "orientation": str(link.get("orientation", "++")),
+            "coverage": str(float(link["coverage"])),
+            "color_set": _color_set([int(color) for color in link["colors"]]),
+        }
+        for link in links
+    ]
+    cfa = CfaGraph(
         metadata={
-            "schema_version": SCHEMA_VERSION,
+            "schema_version": "1.0",
             "graph_id": graph_id,
             "graph_type": "repeat",
-            "contract": "bubbleblower",
+            "contract": "metagenome_to_graph",
             "contract_version": "1.0",
-            "compaction": "identity",
+            "features": {
+                "node": {"coverage": "float", "color_set": "color_set"},
+                "edge": {
+                    "orientation": "orientation",
+                    "coverage": "float",
+                    "color_set": "color_set",
+                },
+            },
         },
-        k=None,
-        unitigs=unitigs,
-        links=link_rows,
-        mapping=mapping,
+        sequences=sequences,
+        nodes=node_rows,
+        edges=edge_rows,
         colors=colors,
+        node_header=["node_id", "coverage", "color_set"],
+        edge_header=["edge_id", "source", "target", "orientation", "coverage", "color_set"],
     )
-    graph = from_cdbg(cdbg, node_coverage, link_coverage)
-    graph.validate()
-    return graph
+    return adopt_cfa(cfa)
 
 
 def semantic_signature(graph: AssemblyGraph) -> tuple:

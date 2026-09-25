@@ -9,7 +9,7 @@ from bubbleblower.debubblers import classify_debubble, compact_same_colour, reso
 from bubbleblower.edits import merge_adjacent, revert
 from bubbleblower.detect import detect_bubbles
 from bubbleblower.fixtures import error_bubble, strain_bubble
-from bubbleblower.graph import build_graph
+from bubbleblower.graph import records_to_tocumg
 from bubbleblower.modes import resolve_mode
 
 pytestmark = pytest.mark.mandatory
@@ -19,7 +19,7 @@ _NAMES = ("kmer_divergence", "colour_topology")
 
 def _three_branch():
     """Three equal-colour branches that share one source and one sink."""
-    return build_graph(
+    return records_to_tocumg(
         graph_id="three_branch",
         colors=[{"color_id": "0", "namespace": "taxon", "value": "taxon_1"}],
         nodes=[
@@ -48,11 +48,10 @@ def test_error_bubble_pops_weak_branch() -> None:
         assert decision.label == "error"
         assert decision.action == "pop"
         resolved = resolve_mode(graph, name)
-        ids = {unitig.unitig_id for unitig in resolved.cdbg.unitigs}
-        assert "E" not in ids
-        assert "A" in ids
+        assert "E" not in resolved.member_ids()
+        assert "A" in resolved.member_ids()
         resolved.validate()
-    assert any(unitig.unitig_id == "E" for unitig in graph.cdbg.unitigs)
+    assert "E" in graph.member_ids()
 
 
 def test_strain_bubble_keeps_both_alleles() -> None:
@@ -63,8 +62,7 @@ def test_strain_bubble_keeps_both_alleles() -> None:
         assert decision.label == "variation"
         assert decision.action == "retain"
         resolved = resolve_debubbler(graph, name)
-        ids = {unitig.unitig_id for unitig in resolved.cdbg.unitigs}
-        assert {"A", "B", "S", "T"} <= ids
+        assert {"A", "B", "S", "T"} <= resolved.member_ids()
         sequences = {unitig.sequence for unitig in resolved.cdbg.unitigs}
         assert "ATATCG" in sequences
         assert "CGCGTA" in sequences
@@ -167,7 +165,7 @@ def test_read_colour_break_skips_reads_without_accession(tmp_path) -> None:
 
 def test_adjacent_same_colour_nodes_merge() -> None:
     """A simple same-colour path collapses. Different colours stay apart."""
-    graph = build_graph(
+    graph = records_to_tocumg(
         graph_id="linear",
         colors=[
             {"color_id": "0", "namespace": "taxon", "value": "taxon_1"},
@@ -186,12 +184,12 @@ def test_adjacent_same_colour_nodes_merge() -> None:
     for link in graph.cdbg.links:
         link.overlap = 0
     merged, edit = merge_adjacent(graph, "eAB")
-    assert {unitig.unitig_id for unitig in graph.cdbg.unitigs} == {"A", "B", "C"}
+    assert graph.member_ids() == {"A", "B", "C"}
     assert len(merged.cdbg.unitigs) == 2
     sequences = {unitig.sequence for unitig in merged.cdbg.unitigs}
     assert "ACGTACGTTTGGTTGG" in sequences
     restored = revert(merged, edit)
-    assert {unitig.unitig_id for unitig in restored.cdbg.unitigs} == {"A", "B", "C"}
+    assert restored.member_ids() == {"A", "B", "C"}
     scratch = graph.copy()
     inplace, _inplace_edit = merge_adjacent(scratch, "eAB", copy_graph=False)
     assert inplace is scratch

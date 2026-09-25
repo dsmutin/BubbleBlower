@@ -25,7 +25,7 @@ def test_strain_bubble_is_retained() -> None:
     posterior = classify_bubble(features)
     assert posterior.decision == "strain"
     assert features.colours_disjoint is True
-    assert {node.unitig_id for node in graph.cdbg.unitigs} >= {"S", "T"}
+    assert {"S", "T"} <= graph.member_ids()
 
 
 def test_error_bubble_is_classified_error() -> None:
@@ -39,8 +39,9 @@ def test_error_bubble_is_classified_error() -> None:
 
 def test_duplicate_keeps_sequence_and_changes_instance() -> None:
     graph = shared_duplicate_node()
-    edited, edit = duplicate_instance(graph, "X")
-    original = edited.unitig("X")
+    shared = graph.unitig_id_for_member("X")
+    edited, edit = duplicate_instance(graph, shared)
+    original = edited.unitig(shared)
     created = edited.unitig(edit.target_ids[1])
     assert original.sequence == created.sequence
     assert sequence_hash(original.sequence) == sequence_hash(created.sequence)
@@ -50,8 +51,9 @@ def test_duplicate_keeps_sequence_and_changes_instance() -> None:
 
 def test_duplicate_merge_round_trip() -> None:
     graph = shared_duplicate_node()
-    edited, edit = duplicate_instance(graph, "X")
-    restored, _merge = merge_instances(edited, list(edit.target_ids), "X")
+    shared = graph.unitig_id_for_member("X")
+    edited, edit = duplicate_instance(graph, shared)
+    restored, _merge = merge_instances(edited, list(edit.target_ids), shared)
     assert semantic_signature(restored) == semantic_signature(graph)
 
 
@@ -99,9 +101,9 @@ def test_fifty_bubble_classifier() -> None:
 
 
 def test_rare_strain_needs_more_than_coverage() -> None:
-    from bubbleblower.graph import build_graph
+    from bubbleblower.graph import records_to_tocumg
 
-    graph = build_graph(
+    graph = records_to_tocumg(
         graph_id="rare",
         colors=[
             {"color_id": "0", "namespace": "taxon", "value": "dominant"},
@@ -131,9 +133,9 @@ def test_rare_strain_needs_more_than_coverage() -> None:
 
 
 def test_equal_coverage_is_uncertain_without_linkage() -> None:
-    from bubbleblower.graph import build_graph
+    from bubbleblower.graph import records_to_tocumg
 
-    graph = build_graph(
+    graph = records_to_tocumg(
         graph_id="equal",
         colors=[
             {"color_id": "0", "namespace": "taxon", "value": "taxon_1"},
@@ -160,9 +162,9 @@ def test_equal_coverage_is_uncertain_without_linkage() -> None:
 
 
 def test_misleading_coverage_uses_kmer_evidence() -> None:
-    from bubbleblower.graph import build_graph
+    from bubbleblower.graph import records_to_tocumg
 
-    graph = build_graph(
+    graph = records_to_tocumg(
         graph_id="misleading",
         colors=[
             {"color_id": "0", "namespace": "taxon", "value": "taxon_1"},
@@ -193,7 +195,7 @@ def test_greedy_improves_score_and_pops_error() -> None:
     strain = strain_bubble()
     before_error = greedy_search(error, max_iterations=5)
     assert before_error.scores[-1].total > before_error.scores[0].total
-    assert all(unitig.unitig_id != "E" for unitig in before_error.graph.cdbg.unitigs)
+    assert "E" not in before_error.graph.member_ids()
     resolved = greedy_search(strain, max_iterations=5)
     sequences = {unitig.sequence for unitig in resolved.graph.cdbg.unitigs}
     assert "ATATCG" in sequences

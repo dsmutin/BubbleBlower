@@ -13,6 +13,6 @@ dependencies:
   - pip:
       # Editable checkout: metametro reads VERSION two directories above the
       # package (the repository root). A wheel leaves that file out, so import fails.
-      - "-e git+https://github.com/dsmutin/MetaMetro.git@15a0e134259f74adfeaa76d5eaf5d8171de650f2#egg=metametro"
+      - "-e git+https://github.com/dsmutin/MetaMetro.git@ac4218954dde455b8604f79cd0f416425540bbdc#egg=metametro"
 variables:
   PYTHONPATH: src

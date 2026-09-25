@@ -1,4 +1,4 @@
 unitig_id	color_set	cfa_nodes	internal_edge_ids	internal_edge_colors	internal_overlaps
-S	1	S			
-A	1	A			
-T	1	T			
+u000001	1	A			
+u000003	1	S			
+u000004	1	T			

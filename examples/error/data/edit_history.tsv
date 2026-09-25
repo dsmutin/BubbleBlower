@@ -1,2 +1,2 @@
 iteration	state_id	parent_state	edit_id	edit_type	source_ids	target_ids	score_before	score_after	accepted
-0	1	0	pop-000013	pop	E		0.452539	1.78976	yes
+0	1	0	pop-000013	pop	u000002		0.452539	1.78976	yes

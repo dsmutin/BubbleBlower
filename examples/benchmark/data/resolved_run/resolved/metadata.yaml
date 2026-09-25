@@ -1,6 +1,9 @@
 schema_version: '1.0'
-graph_id: benchmark-42
+graph_id: bubble_strain_3_n50
 graph_type: repeat
-contract: bubbleblower
+contract: cfa_to_cdbg
 contract_version: '1.0'
 compaction: identity
+source:
+  format: cfa
+  graph_id: bubble_strain_3_n50

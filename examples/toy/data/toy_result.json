@@ -1,7 +1,8 @@
 {
   "status": "resolved",
   "ok": true,
-  "input_path": null,
   "decision": "strain",
-  "n_bubbles": 1
+  "n_bubbles": 1,
+  "bench": "bubble_strain_2",
+  "input_path": "/mnt/tank/scratch/dsmutin/tools/my/metametro/data/bench/bubble_strain_2/inprocess/taxa2"
 }

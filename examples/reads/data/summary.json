@@ -1,8 +1,9 @@
 {
   "n_reads": 40,
   "n_cfa_nodes": 28,
-  "n_allele_unitigs": 4,
-  "n_bubbles": 1,
+  "n_unitigs": 6,
+  "n_bubbles": 0,
   "n_colours": 2,
-  "coverage_source": "read_counts"
+  "coverage_source": "absent",
+  "graph_source": "metametro.benchbuild bubble_reads_2"
 }

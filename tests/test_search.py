@@ -26,8 +26,8 @@ def test_beam_and_mcmc_do_not_lose_score() -> None:
     assert greedy.edits[0].edit_type == "pop"
     assert greedy.edits[0].bubble_id
     assert beam.scores[-1].total > beam.scores[0].total
-    assert all(unitig.unitig_id != "E" for unitig in beam.graph.cdbg.unitigs)
-    assert all(unitig.unitig_id != "E" for unitig in greedy.graph.cdbg.unitigs)
+    assert "E" not in beam.graph.member_ids()
+    assert "E" not in greedy.graph.member_ids()
 
 
 def test_result_tables_round_trip_coverage(tmp_path: Path) -> None:

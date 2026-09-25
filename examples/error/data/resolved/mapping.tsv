@@ -1,4 +1,4 @@
 cfa_node_id	unitig_id	ordinal	length	color_set
-S	S	0	8	1
-A	A	0	8	1
-T	T	0	8	1
+A	u000001	0	8	1
+S	u000003	0	8	1
+T	u000004	0	8	1

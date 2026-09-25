@@ -1,0 +1,10 @@
+---
+description: Benchmark taxids come from pre-generation assignment and must not leak into the GCN.
+alwaysApply: true
+---
+
+# Taxon identity
+
+Benchmark colours on reads use the genome id assigned before metagenome generation. That id is the simulator manifest or MetaMetro `ground_truth/read_to_genome.tsv`. A mock node label, a Kraken call, or a model prediction is not that taxid. If the assignment table is missing, stop. Do not invent one.
+
+The true taxid is evaluation-only. Do not copy it into GCN features (`X_node`, `X_edge`) or into tensor colours (`C_node`, `C_edge`, or a colour-weight channel). Sample colours and predictions may be stored there. The ground-truth taxid may not.
