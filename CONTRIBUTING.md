@@ -62,7 +62,7 @@ Never `git push` unless the human explicitly asks. CI runs on GitHub after they 
 
 ## Examples
 
-Examples live in MetaMetro 0.21.0, not in this repository. Build them there (`metametro benchbuild --all`, or one bench name). A fresh MetaMetro checkout has an empty `data/bench`; that command fills it. Do not commit `data/bench/` or a local copy under `examples/*/data`. Runners in `examples/*/run.py` only load the build with `load_bench_graph`. `load_bench_graph` and `ensure_bench` read and build under MetaMetro's `data/bench` by default. Pass `root=` or set `BUBBLEBLOWER_BENCH_ROOT` to use `{root}/data/bench` instead, for example a MetaMetro worktree or a scratch directory. A graph that exists only inside a test file is a test, not an example.
+Examples live in MetaMetro 0.22.1, not in this repository. Build them there (`metametro benchbuild --all`, or one bench name). A fresh MetaMetro checkout has an empty `data/bench`; that command fills it. Do not commit `data/bench/` or a local copy under `examples/*/data`. Runners in `examples/*/run.py` only load the build with `load_bench_graph`. `load_bench_graph` and `ensure_bench` read and build under MetaMetro's `data/bench` by default. Pass `root=` or set `BUBBLEBLOWER_BENCH_ROOT` to use `{root}/data/bench` instead, for example a MetaMetro worktree or a scratch directory. A graph that exists only inside a test file is a test, not an example.
 
 ## Benchmarks
 
