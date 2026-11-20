@@ -32,11 +32,12 @@ def run(argv: list[str] | None = None) -> int:
     parser.add_argument(
         "--namespace",
         default="composition",
-        help="MetaMetro colouring namespace to load (default: composition). "
-        "taxon is gold and is refused.",
+        help="MetaMetro colouring namespace to load (default: composition); "
+        "'none' drops every colour layer. taxon is gold and is refused.",
     )
     args = parser.parse_args(argv)
-    root, graph = load_bench_graph("bubble_strain_3_n50", namespaces=(args.namespace,))
+    namespaces = () if args.namespace == "none" else (args.namespace,)
+    root, graph = load_bench_graph("bubble_strain_3_n50", namespaces=namespaces)
     from metametro.tables import read_tsv
 
     _header, truth = read_tsv(root / "ground_truth" / "bubbles.tsv")

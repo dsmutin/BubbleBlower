@@ -1,4 +1,4 @@
-"""``ensure_bench`` and ``load_bench_graph`` honour a bench root (#1165) and reject a missing namespace (#1169)."""
+"""``ensure_bench`` and ``load_bench_graph`` honour a bench root (#1165) and reject a missing namespace (#1169); an empty tuple drops every colour (#1172)."""
 
 from __future__ import annotations
 
@@ -39,3 +39,13 @@ def test_missing_namespace_raises(tmp_path, monkeypatch):
     monkeypatch.delenv(BENCH_ROOT_ENV, raising=False)
     with pytest.raises(ContractError, match="load_bench_gold"):
         load_bench_graph(BENCH, namespaces=("taxon",), root=tmp_path)
+
+
+def test_empty_namespaces_drop_every_colour(tmp_path, monkeypatch):
+    monkeypatch.delenv(BENCH_ROOT_ENV, raising=False)
+    _root, coloured = load_bench_graph(BENCH, root=tmp_path)
+    _root, colourless = load_bench_graph(BENCH, namespaces=(), root=tmp_path)
+    assert coloured.cdbg.colors
+    assert not colourless.cdbg.colors
+    assert all(not unitig.color_ids for unitig in colourless.cdbg.unitigs)
+    assert len(colourless.cdbg.unitigs) == len(coloured.cdbg.unitigs)

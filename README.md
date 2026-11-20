@@ -59,7 +59,7 @@ python examples/reads/run.py
 python examples/half/run.py
 ```
 
-`examples/benchmark/run.py --namespace <name>` picks the MetaMetro colouring namespace (default `composition`). The name is written to `metrics.json`. A namespace missing from the build, and gold `taxon`, raise `ContractError`.
+`examples/benchmark/run.py --namespace <name>` picks the MetaMetro colouring namespace (default `composition`; `none` drops every colour layer). The name is written to `metrics.json`. A namespace missing from the build, and gold `taxon`, raise `ContractError`.
 
 ## Tests
 
