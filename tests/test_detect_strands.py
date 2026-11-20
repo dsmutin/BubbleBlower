@@ -66,12 +66,54 @@ def test_forward_fixture_unchanged() -> None:
     assert all(branch.strands == ("+",) for branch in bubble.branches)
 
 
+# Source and sink on different strands (#1190 review): S(a) -> {A, B} -> T(b).
+MIXED_ENDS = {
+    ("+", "-"): [("eSA", "S", "A", "++"), ("eAT", "A", "T", "+-"), ("eSB", "S", "B", "++"), ("eBT", "B", "T", "+-")],
+    ("-", "+"): [("eSA", "S", "A", "-+"), ("eAT", "A", "T", "++"), ("eSB", "S", "B", "-+"), ("eBT", "B", "T", "++")],
+}
+
+
+def _twin(orientation: str) -> str:
+    flip = {"+": "-", "-": "+"}
+    return flip[orientation[1]] + flip[orientation[0]]
+
+
+def _mixed(ends: tuple[str, str], *, twins: bool) -> list[dict]:
+    links = [_link(i, s, t, o) for i, s, t, o in MIXED_ENDS[ends]]
+    if twins:
+        links += [_link(f"r{i}", t, s, _twin(o)) for i, s, t, o in MIXED_ENDS[ends]]
+    return links
+
+
+@pytest.mark.parametrize("ends", sorted(MIXED_ENDS))
+def test_source_and_sink_strands_are_stored_separately(ends: tuple[str, str]) -> None:
+    graph = _graph(_mixed(ends, twins=False))
+    (bubble,) = detect_bubbles(graph)
+    assert (_name(graph, bubble.source), bubble.source_strand) == ("S", ends[0])
+    assert (_name(graph, bubble.sink), bubble.sink_strand) == ("T", ends[1])
+    both = _graph(_mixed(ends, twins=True))
+    (kept,) = detect_bubbles(both)
+    assert kept.source_strand != kept.sink_strand
+    assert {(_name(both, kept.source), kept.source_strand), (_name(both, kept.sink), kept.sink_strand)} in (
+        {("S", ends[0]), ("T", ends[1])},
+        {("T", "+" if ends[1] == "-" else "-"), ("S", "+" if ends[0] == "-" else "-")},
+    )
+
+
 def test_ids_match_metametro_strand_bubbles() -> None:
     bubble_gold = pytest.importorskip("metametro.bench.bubble_gold")
     forward = [_link(i, s, t, "++") for i, s, t in FORWARD]
     reverse = [_link(f"r{i}", t, s, "--") for i, s, t in FORWARD]
-    for links in (forward, reverse, forward + reverse):
+    cases = [forward, reverse, forward + reverse]
+    cases += [_mixed(ends, twins=twins) for ends in sorted(MIXED_ENDS) for twins in (False, True)]
+    for links in cases:
         graph = _graph(links)
-        ours = [bubble.bubble_id for bubble in detect_bubbles(graph)]
-        theirs = [bubble.bubble_id for bubble in bubble_gold.strand_bubbles(graph.cdbg)]
+        ours = [
+            (bubble.bubble_id, (bubble.source, bubble.source_strand), (bubble.sink, bubble.sink_strand))
+            for bubble in detect_bubbles(graph)
+        ]
+        theirs = [
+            (bubble.bubble_id, tuple(bubble.source), tuple(bubble.sink))
+            for bubble in bubble_gold.strand_bubbles(graph.cdbg)
+        ]
         assert ours == theirs
