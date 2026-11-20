@@ -32,6 +32,7 @@ Check a box only after mandatory tests pass. This is the implementation contract
 - [x] Pin MetaMetro 0.20.1 (19a3edb) in environment.yml, CI, and the examples rule (#1169, VERSION 0.12.1)
 - [x] Pin MetaMetro 0.20.2 (97fd453) (#1169, VERSION 0.12.2)
 - [x] Pin MetaMetro 0.21.0 (4ed0762) (VERSION 0.13.1)
+- [x] `examples/benchmark/run.py --namespace` (#1179, VERSION 0.14.0)
 - [x] Examples read the `composition` colouring, never gold `taxon`; `load_bench_graph` raises on a missing namespace; benchmark gates AMBER F1, AUROC, and delta_score, not false_pops (#1169, VERSION 0.13.0)
 
 ## Benchmarks

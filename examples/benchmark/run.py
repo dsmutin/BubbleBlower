@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import json
 import sys
 from pathlib import Path
@@ -25,9 +26,17 @@ from bubbleblower.search import greedy_search  # noqa: E402
 AMBER_F1_MIN = 0.85
 
 
-def run() -> int:
+def run(argv: list[str] | None = None) -> int:
     """Score the MetaMetro 50-bubble build. Primary quality metric is AMBER F1."""
-    root, graph = load_bench_graph("bubble_strain_3_n50", namespaces=("composition",))
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--namespace",
+        default="composition",
+        help="MetaMetro colouring namespace to load (default: composition). "
+        "taxon is gold and is refused.",
+    )
+    args = parser.parse_args(argv)
+    root, graph = load_bench_graph("bubble_strain_3_n50", namespaces=(args.namespace,))
     from metametro.tables import read_tsv
 
     _header, truth = read_tsv(root / "ground_truth" / "bubbles.tsv")
@@ -60,6 +69,7 @@ def run() -> int:
         score_after=resolved.scores[-1],
     )
     metrics = {
+        "namespace": args.namespace,
         "amber_f1": resolution["amber_f1"],
         "classification": classified,
         "resolution": resolution,
