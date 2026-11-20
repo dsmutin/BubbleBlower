@@ -5,7 +5,7 @@ alwaysApply: true
 
 # Examples live in MetaMetro
 
-Example graphs, reads, colourings, and ground truth live in **MetaMetro 0.22.1** (`fdd0519d4a7a7d20be218d63da55ddfcdf1b316a`, https://github.com/dsmutin/metaMetro). They do not live in this repository.
+Example graphs, reads, colourings, and ground truth live in **MetaMetro 0.24.0** (`f268a53a8d0192c478ffda089ffbc17f99ed6a65`, https://github.com/dsmutin/metaMetro). They do not live in this repository.
 
 Build them from that checkout. A fresh checkout has an empty `data/bench`; `benchbuild` fills it:
 

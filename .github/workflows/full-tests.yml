@@ -25,8 +25,8 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: dsmutin/metaMetro
-          # 0.22.1. The checkout has no data/bench; benchbuild --all fills it.
-          ref: fdd0519d4a7a7d20be218d63da55ddfcdf1b316a
+          # 0.24.0. The checkout has no data/bench; benchbuild --all fills it.
+          ref: f268a53a8d0192c478ffda089ffbc17f99ed6a65
           path: metametro
       - uses: conda-incubator/setup-miniconda@v3
         with:
