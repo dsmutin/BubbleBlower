@@ -72,22 +72,57 @@ def _drop_unitig(graph: AssemblyGraph, unitig_id: str) -> None:
     graph.lineage.pop(unitig_id, None)
 
 
+_FLIP = {"+": "-", "-": "+"}
+
+
+def _twin_orientation(orientation: str | None) -> str:
+    """Orientation of the reverse-complement copy of a link (``ab`` -> ``flip(b) flip(a)``)."""
+    forward = orientation or "++"
+    return _FLIP[forward[1]] + _FLIP[forward[0]]
+
+
+def _with_twins(graph: AssemblyGraph, link_ids: tuple[str, ...]) -> tuple[str, ...]:
+    """``link_ids`` plus the reverse-complement twin of each, when the graph stores one.
+
+    The twin of ``u(a) -> v(b)`` is ``v(flip b) -> u(flip a)``. A link that is its
+    own twin, or whose twin is already listed, adds nothing.
+    """
+    chosen = list(link_ids)
+    taken = set(link_ids)
+    for link_id in link_ids:
+        link = graph.link(link_id)
+        want = (link.target, link.source, _twin_orientation(link.orientation))
+        for other in graph.cdbg.links:
+            if other.link_id in taken:
+                continue
+            if (other.source, other.target, other.orientation or "++") == want:
+                chosen.append(other.link_id)
+                taken.add(other.link_id)
+                break
+    return tuple(chosen)
+
+
 def pop_branch(graph: AssemblyGraph, bubble: Bubble, branch_index: int) -> tuple[AssemblyGraph, Edit]:
-    """Remove one bubble branch. Source and sink coverage stay as observed."""
+    """Remove one bubble branch. Source and sink coverage stay as observed.
+
+    Each branch link goes together with its reverse-complement twin, so a pop
+    on a graph that stores both strands (MEGAHIT) leaves no dangling link.
+    """
     if branch_index < 0 or branch_index >= len(bubble.branches):
         raise IndexError(branch_index)
     updated = graph.copy()
     branch = bubble.branches[branch_index]
     removed_ids = set(branch.path)
-    link_ids = set(branch.links)
+    branch_links = _with_twins(updated, tuple(branch.links))
+    link_ids = set(branch_links)
     payload = {
         "unitigs": [copy.deepcopy(updated.unitig(unitig_id)) for unitig_id in branch.path],
-        "links": [copy.deepcopy(updated.link(link_id)) for link_id in branch.links],
+        "links": [copy.deepcopy(updated.link(link_id)) for link_id in branch_links],
         "mapping": [
             copy.deepcopy(row) for row in updated.cdbg.mapping if row.unitig_id in removed_ids
         ],
         "node_coverage": {unitig_id: updated.node_coverage[unitig_id] for unitig_id in branch.path},
-        "link_coverage": {link_id: updated.link_coverage[link_id] for link_id in branch.links},
+        "link_coverage": {link_id: updated.link_coverage[link_id] for link_id in branch_links},
         "lineage": {unitig_id: dict(updated.lineage[unitig_id]) for unitig_id in branch.path},
     }
     updated.cdbg.unitigs = [unitig for unitig in updated.cdbg.unitigs if unitig.unitig_id not in removed_ids]
@@ -96,7 +131,7 @@ def pop_branch(graph: AssemblyGraph, bubble: Bubble, branch_index: int) -> tuple
     for unitig_id in branch.path:
         updated.node_coverage.pop(unitig_id, None)
         updated.lineage.pop(unitig_id, None)
-    for link_id in branch.links:
+    for link_id in branch_links:
         updated.link_coverage.pop(link_id, None)
     edit = Edit(
         edit_id=_remember(updated, "pop"),

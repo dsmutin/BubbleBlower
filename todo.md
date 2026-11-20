@@ -40,6 +40,7 @@ Check a box only after mandatory tests pass. This is the implementation contract
 - [x] `.cursor/rules/` mirrors `agents/rules/` byte for byte; mandatory test `test_rules_mirror.py` (#1191, VERSION 0.15.2)
 - [x] Pin MetaMetro 0.24.0 (f268a53); the #1190 parity test runs on the pin (#1206, VERSION 0.15.3)
 - [x] Links without coverage (MEGAHIT builds) get the `split` share of source coverage in `load_bench_graph`; a fork sums to the source (#1202, VERSION 0.15.4)
+- [x] `pop_branch` removes each branch link with its reverse-complement twin; no dangling link on double-stranded graphs (#1203, VERSION 0.15.5)
 - [x] Examples read the `composition` colouring, never gold `taxon`; `load_bench_graph` raises on a missing namespace; benchmark gates AMBER F1, AUROC, and delta_score, not false_pops (#1169, VERSION 0.13.0)
 
 ## Benchmarks
