@@ -10,6 +10,7 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass
 
+from bubbleblower.detect import detect_bubbles
 from bubbleblower.graph import AssemblyGraph
 
 # Sequencing-error leftover is a small fraction of parent coverage.
@@ -18,13 +19,18 @@ _ERROR_FRACTION = 0.15
 
 @dataclass(frozen=True)
 class Score:
-    """Weighted score and its parts. Higher is better."""
+    """Weighted score and its parts. Higher is better.
+
+    ``n_forks`` counts unitigs with two or more outgoing links. ``n_bubbles``
+    counts simple bubbles from ``detect_bubbles``.
+    """
 
     total: float
     coverage: float
     flow: float
     topology: float
     complexity: float
+    n_forks: int
     n_bubbles: int
     n_instances: int
     colour: float = 0.0
@@ -149,7 +155,8 @@ def score_graph(graph: AssemblyGraph, *, k_max: int = 3) -> Score:
         flow=flow,
         topology=topology,
         complexity=complexity,
-        n_bubbles=n_forks,
+        n_forks=n_forks,
+        n_bubbles=len(detect_bubbles(graph)),
         n_instances=n_instances,
         colour=colour,
     )

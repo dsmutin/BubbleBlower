@@ -47,3 +47,18 @@ def test_result_tables_round_trip_coverage(tmp_path: Path) -> None:
     assert any(row.split("\t")[edit_col] == "pop" for row in rows)
     history_header = (tmp_path / "edit_history.tsv").read_text(encoding="utf-8").splitlines()[1].split("\t")
     assert history_header[1] != history_header[2] or history_header[9] == "no"
+
+
+def test_state_scores_separate_forks_bubbles_and_colour(tmp_path: Path) -> None:
+    """state_scores.tsv reports forks, detected bubbles, and the colour term apart."""
+    result = greedy_search(error_bubble(), max_iterations=4)
+    write_result(result, tmp_path)
+    header, first, *_rest = (tmp_path / "state_scores.tsv").read_text(encoding="utf-8").splitlines()
+    columns = header.split("\t")
+    assert {"colour_score", "n_forks", "n_bubbles"} <= set(columns)
+    row = dict(zip(columns, first.split("\t")))
+    assert int(row["n_bubbles"]) == 1
+    assert int(row["n_forks"]) >= 1
+    assert float(row["colour_score"]) == pytest.approx(result.scores[0].colour)
+    last = dict(zip(columns, (tmp_path / "state_scores.tsv").read_text(encoding="utf-8").splitlines()[-1].split("\t")))
+    assert int(last["n_bubbles"]) == 0

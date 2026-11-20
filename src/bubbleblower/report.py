@@ -109,6 +109,8 @@ def write_result(result: SearchResult, directory: str | Path) -> None:
                 f"{score.flow:.6g}",
                 f"{-score.topology:.6g}",
                 f"{-score.complexity:.6g}",
+                f"{score.colour:.6g}",
+                str(score.n_forks),
                 str(score.n_bubbles),
                 str(score.n_instances),
             ]
@@ -123,6 +125,8 @@ def write_result(result: SearchResult, directory: str | Path) -> None:
             "likelihood_score",
             "topology_penalty",
             "complexity_penalty",
+            "colour_score",
+            "n_forks",
             "n_bubbles",
             "n_instances",
         ],
