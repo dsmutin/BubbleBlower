@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run bubbleblower baseline on the toy example and check the contract."""
+"""Run bubbleblower on the toy example and check the contract."""
 
 from __future__ import annotations
 

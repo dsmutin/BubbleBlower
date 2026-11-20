@@ -19,7 +19,7 @@ def test_cli_version(capsys: pytest.CaptureFixture[str]) -> None:
 
 
 def test_cli_baseline_stdout(capsys: pytest.CaptureFixture[str]) -> None:
-    """Default CLI run prints JSON with baseline status."""
+    """Default CLI run prints JSON for the built-in strain bubble."""
     assert main([]) == 0
     payload = json.loads(capsys.readouterr().out)
     assert payload["status"] == "resolved"

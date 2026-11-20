@@ -8,11 +8,12 @@ English is required for every public function, class, module, CLI flag, data fil
 
 ```
 CLI (bubbleblower.cli)
-  → baseline pipeline (bubbleblower.baseline.run_pipeline)
+  → with --cdbg or --out-dir: search on the graph (bubbleblower.search)
+  → otherwise: built-in strain bubble (bubbleblower.pipeline.run_demo)
       → JSON result {status, ok, input_path}
 
 tests/          mandatory vs optional pytest
-examples/toy/   end-to-end run of the current (baseline) tool
+examples/toy/   end-to-end run of the current tool
 cite/           BibTeX for integrated third-party tools
 agents/         portable rules and skills (any IDE)
 ```

@@ -6,9 +6,8 @@ import argparse
 import json
 
 from bubbleblower import __version__
-from bubbleblower.baseline import run_pipeline
 from bubbleblower.fixtures import strain_bubble
-from bubbleblower.pipeline import load_assembly
+from bubbleblower.pipeline import load_assembly, run_demo
 from bubbleblower.report import write_result
 from bubbleblower.search import beam_search, greedy_search, mcmc_search
 
@@ -40,7 +39,7 @@ def _resolve_cli(cdbg: str | None, out_dir: str | None, search: str) -> dict:
 
 
 def main(argv: list[str] | None = None) -> int:
-    """Parse CLI arguments and run the baseline pipeline."""
+    """Parse CLI arguments and resolve a graph, or classify the built-in strain bubble."""
     parser = argparse.ArgumentParser(prog="bubbleblower", description="Iterative debubbling of totally coloured assembly graphs")
     parser.add_argument("--version", action="store_true", help="print version and exit")
     parser.add_argument("-o", "--output", default="-", help="JSON output path or - for stdout")
@@ -59,7 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.cdbg or args.out_dir:
         result = _resolve_cli(args.cdbg, args.out_dir, args.search)
     else:
-        result = run_pipeline()
+        result = run_demo()
     text = json.dumps(result, indent=2)
     if args.output in {"", "-"}:
         print(text)

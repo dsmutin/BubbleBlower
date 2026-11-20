@@ -61,3 +61,21 @@ def summarize(graph: AssemblyGraph, *, mode: str = "coverage") -> dict:
             for posterior in posteriors
         ],
     }
+
+
+def run_demo() -> dict:
+    """Classify the built-in strain bubble without editing.
+
+    The return value keeps ``status``, ``ok``, and ``input_path``.
+    """
+    from bubbleblower.fixtures import strain_bubble
+
+    summary = summarize(strain_bubble())
+    decision = summary["bubbles"][0]["decision"] if summary["bubbles"] else None
+    return {
+        "status": "resolved",
+        "ok": decision == "strain",
+        "input_path": None,
+        "decision": decision,
+        "n_bubbles": summary["n_bubbles"],
+    }
