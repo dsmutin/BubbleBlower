@@ -23,12 +23,66 @@ def _bench_root(root: Path | str | None) -> Path | None:
     return Path(value) if value else None
 
 
+def _default_colourings(applied: list[str]) -> bool:
+    """Whether manifest ``colourings`` look like a default build (``colourings=None``).
+
+    MetaMetro does not record the request in the manifest. A default build runs
+    every automatic colouring that can run, in registration order, starting
+    with ``as_built``. An explicit selection either omits ``as_built``, names a
+    non-automatic colouring, or breaks that order.
+    """
+    from metametro.bench.colourings import listed_colourings
+
+    auto = [colouring for colouring, _namespace, is_auto in listed_colourings() if is_auto]
+    if not applied or applied[0] != "as_built" or any(item not in auto for item in applied):
+        return False
+    positions = [auto.index(item) for item in applied]
+    return positions == sorted(positions)
+
+
+def check_reused_build(name: str, destination: Path) -> None:
+    """Reject a bench directory that a current MetaMetro would not have written.
+
+    A manifest without ``gold_namespaces`` predates gold ground truth outside
+    the colour layers (MetaMetro 0.23.0). When ``canonical_identity(name)`` is
+    known and the build used the default colourings, its ``identity.sha256``
+    (or the manifest ``identity``) must equal it. A build with an explicit
+    colouring selection, or a bench without a canonical identity (roxel, spb,
+    communities), is not compared. Raises ``ContractError`` with a rebuild hint.
+    """
+    from metametro.errors import ContractError
+    from metametro.tables import read_yaml
+
+    hint = f"remove {destination} and rerun metametro benchbuild {name}"
+    manifest_path = destination / "manifest.yaml"
+    manifest = read_yaml(manifest_path) if manifest_path.is_file() else {}
+    if "gold_namespaces" not in manifest:
+        raise ContractError([f"bench {name} at {destination} has no gold_namespaces in manifest.yaml (stale build); {hint}"])
+    try:
+        from metametro.bench import canonical_identity
+    except ImportError:
+        return
+    expected = canonical_identity(name)
+    if expected is None or not _default_colourings([str(item) for item in manifest.get("colourings") or []]):
+        return
+    identity_path = destination / "identity.sha256"
+    if identity_path.is_file():
+        found = (identity_path.read_text(encoding="utf-8").split() or [""])[0]
+    else:
+        found = str(manifest.get("identity", ""))
+    if found != expected:
+        raise ContractError(
+            [f"bench {name} at {destination} has identity {found or 'none'}, not the canonical {expected} (stale build); {hint}"]
+        )
+
+
 def ensure_bench(name: str, *, root: Path | str | None = None) -> Path:
     """Return the bench directory, building an in-process graph when it is absent.
 
     The directory is ``{root}/data/bench/{name}/...`` as in MetaMetro
     ``default_outdir``. ``root`` falls back to ``$BUBBLEBLOWER_BENCH_ROOT`` and
-    then to the MetaMetro repository.
+    then to the MetaMetro repository. A directory that is already built is
+    checked with :func:`check_reused_build` before it is reused.
     """
     try:
         from metametro.bench.build import build
@@ -41,6 +95,7 @@ def ensure_bench(name: str, *, root: Path | str | None = None) -> Path:
     spec = resolve(name)
     destination = default_outdir(spec, root=_bench_root(root))
     if (destination / "cfa" / "metadata.yaml").is_file() and (destination / "cdbg" / "metadata.yaml").is_file():
+        check_reused_build(spec.name, destination)
         return destination
     if destination.exists() and any(destination.iterdir()):
         raise SystemExit(

@@ -43,6 +43,7 @@ Check a box only after mandatory tests pass. This is the implementation contract
 - [x] `pop_branch` removes each branch link with its reverse-complement twin; no dangling link on double-stranded graphs (#1203, VERSION 0.15.5)
 - [x] Strand fixture with source and sink on different strands; parity test checks ids and both ends against MetaMetro `strand_bubbles` (#1190 review, VERSION 0.15.6)
 - [x] `tests/test_bench_input.py` is mandatory; the colourless test also checks link, internal-edge, and mapping colours (#1172 stage 1 review, VERSION 0.15.7)
+- [x] `ensure_bench` rejects a reused build without `gold_namespaces`, or a default build whose identity differs from `canonical_identity` (#1209, VERSION 0.15.8)
 - [x] Examples read the `composition` colouring, never gold `taxon`; `load_bench_graph` raises on a missing namespace; benchmark gates AMBER F1, AUROC, and delta_score, not false_pops (#1169, VERSION 0.13.0)
 
 ## Benchmarks
