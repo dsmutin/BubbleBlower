@@ -9,6 +9,12 @@ The CFA has no coverage column. Every unitig and every link is given
 coverage 1 so ``split_instance`` can run. That constant is not a measured
 depth.
 
+Edges are coloured by the road ``type``. Since MetaMetro 0.23.0 that is gold
+ground truth, not a colour layer, so it is read from the bench's
+``ground_truth/`` with ``metametro.bench.load_bench_gold`` and passed to the
+drawing only. The fork resolution never sees it. ``--cfa`` is the bench's
+``cfa`` directory; the bench directory is its parent.
+
 Usage::
 
     python figures/resolution/render_roxel.py --cfa /path/to/roxel/cfa --out figures/resolution/roxel.mp4
@@ -23,6 +29,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 sys.path.insert(0, str(ROOT / "src"))
 
+from metametro.bench import load_bench_gold  # noqa: E402
 from metametro.converters.cfa_to_cdbg import cfa_to_cdbg  # noqa: E402
 from metametro.formats.cfa.io import load_cfa  # noqa: E402
 
@@ -46,6 +53,12 @@ def _with_unit_coverage(graph):
     return graph
 
 
+def gold_edge_labels(bench: Path, namespace: str) -> dict[str, tuple[str, ...]]:
+    """Gold ``namespace`` values per CFA edge id (ToCUMG link ids are CFA edge ids). Display only."""
+    gold = load_bench_gold(bench, namespace)
+    return {edge_id: tuple(values) for edge_id, values in gold.edges.items()}
+
+
 def main(argv: list[str] | None = None) -> int:
     """Load a roxel CFA, split every fork, and write the video through the last state."""
     parser = argparse.ArgumentParser(description="Animate roxel fork resolution.")
@@ -63,6 +76,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     graph = _with_unit_coverage(from_cdbg(cfa_to_cdbg(load_cfa(args.cfa))))
     frames, edits = fork_resolution_states(graph)
+    road_type = gold_edge_labels(args.cfa.parent, "type")
     seconds = args.seconds if args.seconds is not None else max(30.0, 0.25 * len(edits))
     print(
         f"edits {len(edits)} frames {len(frames)} "
@@ -75,6 +89,7 @@ def main(argv: list[str] | None = None) -> int:
         edits,
         args.out,
         namespace="type",
+        edge_labels=road_type,
         seconds=seconds,
         seed=0,
         hold_seconds=4.0,

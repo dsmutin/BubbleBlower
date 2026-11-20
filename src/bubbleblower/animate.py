@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import math
 import shutil
+from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 
 import numpy as np
@@ -170,6 +171,7 @@ def animate_states(
     seconds: float = 5.0,
     seed: int = 0,
     hold_seconds: float = 0.0,
+    edge_labels: Mapping[str, Sequence[str]] | None = None,
 ) -> Path:
     """Write a GIF or MP4 of about ``seconds``, then hold the last frame.
 
@@ -180,6 +182,11 @@ def animate_states(
     Edge colour is one value of ``namespace`` (Set1). A link with several
     values of that namespace is Other. A link with none is Unclassified.
     Node colour is degree on a YlGnBu scale fixed from the first graph.
+
+    ``edge_labels`` maps a link id to its values, for labels that are not a
+    colour layer (gold ground truth). Edges are then coloured from it, and
+    ``namespace`` only titles the legend. It is for display: the frames are
+    already computed and nothing else reads it.
     """
     if seconds <= 0:
         raise ValueError("seconds must be positive")
@@ -194,13 +201,25 @@ def animate_states(
         raise ValueError("animation needs at least one graph")
     output.parent.mkdir(parents=True, exist_ok=True)
     layouts = layout_states(frames, edits, seed=seed)
-    palette = _namespace_palette(frames[0], namespace)
+    if edge_labels is None:
+        palette = _namespace_palette(frames[0], namespace)
+
+        def label_of(graph: AssemblyGraph, link) -> str:
+            return _edge_label(graph, link.color_ids, namespace)
+
+    else:
+        palette = _label_palette({value for values in edge_labels.values() for value in values}, namespace)
+
+        def label_of(graph: AssemblyGraph, link) -> str:
+            return _pick_label(sorted(set(edge_labels.get(link.link_id, ()))))
+
     degree_limit = max(_degrees(frames[0]).values(), default=1.0)
     pictures = _tween(frames, edits, layouts, steps=_steps_per_edit(len(edits)))
     _write_animation(
         pictures,
         palette,
         namespace,
+        label_of,
         degree_limit,
         output,
         seconds=seconds,
@@ -472,6 +491,12 @@ def _namespace_palette(graph: AssemblyGraph, namespace: str) -> dict[str, str]:
     }
     if not values:
         raise ValueError(f"colour namespace {namespace!r} is not on the graph")
+    return _label_palette(values, namespace)
+
+
+def _label_palette(values: set[str], namespace: str) -> dict[str, str]:
+    if not values:
+        raise ValueError(f"no {namespace!r} labels to colour edges with")
     ordered = sorted(values)
     colours = {label: _SET1[index % len(_SET1)] for index, label in enumerate(ordered)}
     colours["Other"] = _OTHER
@@ -479,13 +504,16 @@ def _namespace_palette(graph: AssemblyGraph, namespace: str) -> dict[str, str]:
     return colours
 
 
-def _edge_label(graph: AssemblyGraph, color_ids: list[int], namespace: str) -> str:
-    values = _namespace_values(graph, color_ids, namespace)
+def _pick_label(values: list[str]) -> str:
     if not values:
         return "Unclassified"
     if len(values) > 1:
         return "Other"
     return values[0]
+
+
+def _edge_label(graph: AssemblyGraph, color_ids: list[int], namespace: str) -> str:
+    return _pick_label(_namespace_values(graph, color_ids, namespace))
 
 
 def _degrees(graph: AssemblyGraph) -> dict[str, float]:
@@ -500,6 +528,7 @@ def _write_animation(
     pictures: list[tuple[AssemblyGraph, dict[str, tuple[float, float]]]],
     palette: dict[str, str],
     namespace: str,
+    label_of: Callable[[AssemblyGraph, object], str],
     degree_limit: float,
     path: Path,
     *,
@@ -557,7 +586,7 @@ def _write_animation(
                 if link.source not in index or link.target not in index:
                     continue
                 segments.append([coordinates[index[link.source]], coordinates[index[link.target]]])
-                colours.append(palette[_edge_label(graph, link.color_ids, namespace)])
+                colours.append(palette[label_of(graph, link)])
             if segments:
                 axis.add_collection(LineCollection(segments, colors=colours, linewidths=0.6, zorder=1))
             degree = _degrees(graph)

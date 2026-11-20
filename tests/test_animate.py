@@ -116,3 +116,38 @@ def _neighbours(graph, seeds: set[str]) -> set[str]:
             found.add(link.source)
             found.add(link.target)
     return found
+
+
+def test_edge_labels_colour_edges_without_a_colour_layer(tmp_path: Path, monkeypatch) -> None:
+    """Gold labels from outside the graph colour the edges and are not written onto it (#1210)."""
+    import bubbleblower.animate as animate
+
+    frames, edits = colour_partition_states(strain_bubble(), namespace="taxon")
+    colours_before = [list(frame.cdbg.colors or []) for frame in frames]
+    links = [link.link_id for link in frames[0].cdbg.links]
+    labels = {links[0]: ("primary",), links[1]: ("primary", "service")}
+    seen: dict = {}
+
+    def capture(pictures, palette, namespace, label_of, *args, **kwargs):
+        seen["palette"] = palette
+        seen["namespace"] = namespace
+        seen["labels"] = {link.link_id: label_of(graph, link) for graph, _ in pictures for link in graph.cdbg.links}
+        Path(args[-1]).write_bytes(b"x")
+
+    monkeypatch.setattr(animate, "_write_animation", capture)
+    animate_states(frames, edits, tmp_path / "gold.gif", namespace="road type", edge_labels=labels, seconds=1.0)
+    assert seen["namespace"] == "road type"
+    assert set(seen["palette"]) == {"primary", "service", "Other", "Unclassified"}
+    assert seen["labels"][links[0]] == "primary"
+    assert seen["labels"][links[1]] == "Other"
+    assert all(seen["labels"][link_id] == "Unclassified" for link_id in links[2:])
+    assert [list(frame.cdbg.colors or []) for frame in frames] == colours_before
+
+
+def test_edge_labels_write_a_gif(tmp_path: Path) -> None:
+    frames, edits = colour_partition_states(strain_bubble(), namespace="taxon")
+    labels = {link.link_id: ("primary",) for link in frames[0].cdbg.links}
+    gif = animate_states(frames, edits, tmp_path / "gold.gif", namespace="not_a_layer", edge_labels=labels, seconds=1.0)
+    assert gif.is_file() and gif.stat().st_size > 0
+    with pytest.raises(ValueError, match="not on the graph"):
+        animate_states(frames, edits, tmp_path / "layer.gif", namespace="not_a_layer", seconds=1.0)
