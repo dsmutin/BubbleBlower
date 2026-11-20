@@ -13,8 +13,8 @@ dependencies:
   - pillow=11.3.0
   - pip
   - pip:
-      # MetaMetro 0.20.1 (19a3edb). Editable: a wheel omits VERSION, so import fails.
+      # MetaMetro 0.20.2 (97fd453). Editable: a wheel omits VERSION, so import fails.
       # https://github.com/dsmutin/metaMetro
-      - "-e git+https://github.com/dsmutin/metaMetro.git@19a3edb92543a8ed71227e08b943bc716076d25f#egg=metametro"
+      - "-e git+https://github.com/dsmutin/metaMetro.git@97fd453b78ac69250c008f152e1b7896a7a20ab4#egg=metametro"
 variables:
   PYTHONPATH: src
