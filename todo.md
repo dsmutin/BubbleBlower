@@ -37,6 +37,7 @@ Check a box only after mandatory tests pass. This is the implementation contract
 - [x] Pin MetaMetro 0.22.1 (fdd0519) (VERSION 0.14.2)
 - [x] Strand-aware `detect_bubbles`: oriented unitigs, one bubble per strand pair; phage_10 ids match gold 94/94 (#1190, VERSION 0.15.0)
 - [x] Colourless baseline: `--namespace none` / `namespaces=()` drops every colour layer (#1172 stage 1, VERSION 0.15.1)
+- [x] `.cursor/rules/` mirrors `agents/rules/` byte for byte; mandatory test `test_rules_mirror.py` (#1191, VERSION 0.15.2)
 - [x] Examples read the `composition` colouring, never gold `taxon`; `load_bench_graph` raises on a missing namespace; benchmark gates AMBER F1, AUROC, and delta_score, not false_pops (#1169, VERSION 0.13.0)
 
 ## Benchmarks

@@ -18,6 +18,8 @@ cite/           BibTeX for integrated third-party tools
 agents/         portable rules and skills (any IDE)
 ```
 
+Edit rules only in `agents/rules/`, then copy each changed file to `.cursor/rules/` (`cp agents/rules/*.mdc .cursor/rules/`). The mandatory test `tests/test_rules_mirror.py` fails when the mirror differs.
+
 The wiki is the [GitHub wiki](https://github.com/dsmutin/BubbleBlower/wiki), not a directory in this repository. Keep the documented return keys until you change the contract on the [Contracts](https://github.com/dsmutin/BubbleBlower/wiki/Contracts) page and the tests together.
 
 ## Testing architecture
