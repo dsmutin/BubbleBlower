@@ -8,17 +8,23 @@ Check a box only after mandatory tests pass. This is the implementation contract
 - [x] A CGT is a view of that ToCUMG (`from_cgt`, `as_cgt`). It is not a second graph
 - [x] GFA and MEGAHIT FASTG enter through MetaMetro `gfa_to_cfa` and `fastg_to_cfa`
 - [x] Read colouring is MetaMetro `colour_by_read_accessions`; examples select ToCUMG namespaces
-- [x] CLI `--search` defaults to `greedy`; `none` is a deprecated alias (VERSION 0.10.5)
 
 ## Edits and launch criteria
 
 - [x] Animate each resolution state on a pinned Fruchterman–Reingold layout (VERSION 0.10.2)
-- [x] Install MetaMetro 0.17.1 in the GitHub conda env (VERSION 0.10.3)
-- [x] Score toy, error, and benchmark benches on the taxon layer (VERSION 0.10.4)
 - [ ] On each iteration, either merge two nodes that sit in one bubble or next to each other, unioning their colours, or split one node
 - [ ] A split partitions that node's colour: a binary 0/1 mask, or a gradual weight in `[0, 1]`, chosen by the method and by whether the colour channel is a mask or a score
 - [ ] A launch criterion chooses merge versus split. Bayesian criteria that exist today are posteriors only: `coverage` (Poisson, `coverage-poisson-1`) and `multimodal` (those coverage terms plus colour equality, long-read linkage, and k-mer support). They adjust a pop candidate. They do not choose merge versus split
 - [ ] An ML launch criterion on a CGT (NumPy GCN or PyG GCN from MetaMetro). Not implemented. `kmer_divergence` and `colour_topology` are fixed thresholds, not a trained model
+- [ ] Train debubblers on MetaMetro benches and check them on initial MEGAHIT graphs (k21 FASTG plus bubble_seq.fa) from half_strains, low75, low75half, high100, heldout_genera. Uses the ML launch criterion above
+- [ ] Cap debubbler edits at the first-pass decision count in the library. Today the cap lives only in `examples/half/score_*`; the library default is `max(8, 3 × bubbles)` (`debubblers.py`)
+
+## Environment and CLI
+
+- [x] Install MetaMetro 0.17.1 in the GitHub conda env (VERSION 0.10.3)
+- [x] Score toy, error, and benchmark benches on the taxon layer (VERSION 0.10.4)
+- [x] CLI `--search` defaults to `greedy`; `none` is a deprecated alias (VERSION 0.10.5)
+- [x] Restore the MEGAHIT training and edit-cap items, and move environment items out of edits (VERSION 0.10.6)
 
 ## Benchmarks
 
