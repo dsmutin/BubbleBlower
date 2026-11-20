@@ -9,7 +9,7 @@ from __future__ import annotations
 import os
 from pathlib import Path
 
-from bubbleblower.graph import AssemblyGraph, from_cdbg
+from bubbleblower.graph import AssemblyGraph, from_cdbg, split_link_coverage
 
 
 BENCH_ROOT_ENV = "BUBBLEBLOWER_BENCH_ROOT"
@@ -56,6 +56,9 @@ def load_bench_graph(
 ) -> tuple[Path, AssemblyGraph]:
     """Build or reuse ``name`` and copy CFA coverage onto the compacted graph.
 
+    Links without a CFA coverage (MEGAHIT builds) get one from
+    :func:`bubbleblower.graph.split_link_coverage` when every unitig has coverage.
+
     ``namespaces`` keeps those colour layers from the MetaMetro ToCUMG. ``None``
     keeps every layer; an empty tuple drops every layer (a colourless baseline).
     A requested namespace that the build does not have raises ``ContractError``.
@@ -94,8 +97,14 @@ def load_bench_graph(
     link_coverage = {
         link.link_id: edge_column[link.link_id] for link in cdbg.links if link.link_id in edge_column
     }
-    return root, from_cdbg(
+    missing = len(cdbg.links) - len(link_coverage)
+    if node_coverage and missing and len(node_coverage) == len(cdbg.unitigs):
+        link_coverage = split_link_coverage(cdbg, node_coverage, link_coverage)
+    graph = from_cdbg(
         cdbg,
         node_coverage=node_coverage or None,
         link_coverage=link_coverage or None,
     )
+    if node_coverage and missing and len(node_coverage) == len(cdbg.unitigs):
+        graph.coverage_source = f"cfa_coverage_column; {missing} links without coverage split source coverage by target coverage"
+    return root, graph

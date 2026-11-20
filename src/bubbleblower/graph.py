@@ -149,6 +149,35 @@ def from_cdbg(
     return graph
 
 
+def split_link_coverage(
+    cdbg: Cdbg, node_coverage: dict[str, float], link_coverage: dict[str, float]
+) -> dict[str, float]:
+    """Fill coverage for links that have none, by the ``split`` rule.
+
+    MEGAHIT builds from MetaMetro carry node coverage but no link coverage. A
+    link from source end ``(u, s)`` to target ``v`` gets
+    ``cov(u) * cov(v) / sum(cov(w) for every target w of (u, s))``, so the
+    links leaving one source end sum to the source's coverage. Targets with
+    zero total coverage share the source evenly. Links that already have a
+    coverage keep it. The source strand is the first orientation character;
+    a link without orientation leaves the ``+`` end.
+    """
+    filled = dict(link_coverage)
+    ends: dict[tuple[str, str], list] = {}
+    for link in cdbg.links:
+        ends.setdefault((link.source, (link.orientation or "+")[0]), []).append(link)
+    for (source, _strand), links in ends.items():
+        if all(link.link_id in filled for link in links):
+            continue
+        weights = [node_coverage[link.target] for link in links]
+        total = sum(weights)
+        for link, weight in zip(links, weights):
+            if link.link_id not in filled:
+                share = weight / total if total > 0 else 1.0 / len(links)
+                filled[link.link_id] = node_coverage[source] * share
+    return filled
+
+
 def _column(rows: list[dict[str, str]], name: str) -> dict[str, str] | None:
     if not rows or name not in rows[0]:
         return None
