@@ -27,6 +27,7 @@ Check a box only after mandatory tests pass. This is the implementation contract
 - [x] Restore the MEGAHIT training and edit-cap items, and move environment items out of edits (VERSION 0.10.6)
 - [x] Remove the `baseline` module; the no-graph CLI path is `pipeline.run_demo` (VERSION 0.10.7)
 - [x] `state_scores.tsv` reports `n_forks`, detected `n_bubbles`, and `colour_score` separately (VERSION 0.11.0)
+- [x] Example outputs under `examples/{toy,error,reads,benchmark}/data` are untracked and ignored; `examples/half/data` metrics JSONs stay until the #231 manifest (VERSION 0.11.1)
 
 ## Benchmarks
 

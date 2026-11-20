@@ -1,6 +1,6 @@
 # Inference figures
 
-Publication figures for checked-in BubbleBlower examples. Built with `cnsplots` 0.6.0 by `plot_inference.py`. The script reads existing tables and does not rerun inference.
+Publication figures for BubbleBlower examples. Built with `cnsplots` 0.6.0 by `plot_inference.py`. The script reads existing tables and does not rerun inference. The `examples/half/data` metrics are tracked. The benchmark and error tables are not tracked: run `examples/benchmark/run.py` and `examples/error/run.py` first.
 
 | File | What it shows | Source |
 |------|----------------|--------|

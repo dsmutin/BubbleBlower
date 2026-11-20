@@ -177,9 +177,9 @@ that beam does anything.
 - `_means` k-means with 12 fixed iterations is fine for the MVP; if it stays,
   seed the initialisation explicitly in the docstring (it is deterministic
   via sorting, which is good).
-- `examples/*/data/` outputs are tracked in git. That is acceptable for a
-  toy, but the read-level FASTQ and CFA are regenerated on each run and
-  will produce noisy diffs.
+- Fixed in 0.11.1: `examples/*/data/` outputs are no longer tracked and are
+  in `.gitignore`. Only the `examples/half/data` metrics JSONs stay until the
+  #231 manifest exists.
 
 ## What matches the specification
 
