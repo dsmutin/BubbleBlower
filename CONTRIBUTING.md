@@ -87,8 +87,10 @@ Use MetaMetro to select layers:
 ```python
 from bubbleblower.bench_input import load_bench_graph
 
-root, graph = load_bench_graph("bubble_strain_2", namespaces=("taxon", "composition"))
+root, graph = load_bench_graph("bubble_strain_2", namespaces=("composition",))
 ```
+
+`load_bench_graph` raises `ContractError` when a requested namespace is missing. Since MetaMetro 0.20.0, `taxon` is gold ground truth, not a colour layer. Use it only for scoring, through `metametro.bench.load_bench_gold`. It is never an input to a debubbler.
 
 ## Taxon identifiers
 

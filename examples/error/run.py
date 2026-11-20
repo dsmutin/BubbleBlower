@@ -19,7 +19,7 @@ from bubbleblower.search import greedy_search  # noqa: E402
 
 def run() -> int:
     """Resolve the sequencing-error bubble from MetaMetro and require the error node to be gone."""
-    _root, graph = load_bench_graph("bubble_error_1", namespaces=("taxon",))
+    _root, graph = load_bench_graph("bubble_error_1", namespaces=("composition",))
     result = greedy_search(graph, max_iterations=5)
     out = Path(__file__).resolve().parent / "data"
     write_result(result, out)

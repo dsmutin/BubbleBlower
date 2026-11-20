@@ -56,8 +56,10 @@ def load_bench_graph(
 ) -> tuple[Path, AssemblyGraph]:
     """Build or reuse ``name`` and copy CFA coverage onto the compacted graph.
 
-    ``namespaces`` keeps those colour layers from the MetaMetro ToCUMG.
-    ``root`` is passed to :func:`ensure_bench`.
+    ``namespaces`` keeps those colour layers from the MetaMetro ToCUMG. A
+    requested namespace that the build does not have raises ``ContractError``.
+    ``taxon`` is gold ground truth since MetaMetro 0.20.0; read it with
+    ``metametro.bench.load_bench_gold``. ``root`` is passed to :func:`ensure_bench`.
     """
     from metametro.contracts.colour_filter import filter_colours
     from metametro.formats.cdbg.io import load_cdbg
@@ -67,6 +69,15 @@ def load_bench_graph(
     cfa = load_cfa(root / "cfa")
     cdbg = load_cdbg(root / "cdbg")
     if namespaces:
+        present = {row["namespace"] for row in cfa.colors}
+        missing = [name for name in namespaces if name not in present]
+        if missing:
+            from metametro.errors import ContractError
+
+            hint = "; taxon is gold ground truth, read it with load_bench_gold" if "taxon" in missing else ""
+            raise ContractError(
+                [f"bench {name} has no colour namespace {', '.join(missing)} (has {', '.join(sorted(present))}){hint}"]
+            )
         cfa = filter_colours(cfa, namespaces=namespaces)
         cdbg = filter_colours(cdbg, namespaces=namespaces)
     node_column = {row["node_id"]: float(row["coverage"]) for row in cfa.nodes if "coverage" in row}
