@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import pytest
 
+pytestmark = pytest.mark.mandatory
+
 pytest.importorskip("metametro.bench.build")
 
 from metametro.errors import ContractError  # noqa: E402
@@ -48,4 +50,10 @@ def test_empty_namespaces_drop_every_colour(tmp_path, monkeypatch):
     assert coloured.cdbg.colors
     assert not colourless.cdbg.colors
     assert all(not unitig.color_ids for unitig in colourless.cdbg.unitigs)
+    assert all(not any(edge) for unitig in colourless.cdbg.unitigs for edge in unitig.internal_edge_colors)
+    assert any(link.color_ids for link in coloured.cdbg.links)
+    assert colourless.cdbg.links and all(not link.color_ids for link in colourless.cdbg.links)
+    assert any(row.color_ids for row in coloured.cdbg.mapping)
+    assert colourless.cdbg.mapping and all(not row.color_ids for row in colourless.cdbg.mapping)
     assert len(colourless.cdbg.unitigs) == len(coloured.cdbg.unitigs)
+    assert len(colourless.cdbg.links) == len(coloured.cdbg.links)
