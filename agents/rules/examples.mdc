@@ -17,8 +17,10 @@ metametro benchbuild bubble_strain_2
 BubbleBlower only runs a loader against that build:
 
 ```python
-load_bench_graph("bubble_strain_2", namespaces=("taxon",))
+load_bench_graph("bubble_strain_2", namespaces=("composition",))
 ```
+
+`taxon` is gold ground truth: read it with `load_bench_gold`. `load_bench_graph` raises `ContractError` for it.
 
 Do not commit the build. That includes MetaMetro `data/bench/` and a second copy under `examples/*/data` (CFA, CDBG, unitigs, links, reads, ground truth, or metrics written from a local bench). If the bench directory is missing, run `benchbuild`. Do not paste a local graph in its place.
 
