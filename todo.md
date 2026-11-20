@@ -29,6 +29,7 @@ Check a box only after mandatory tests pass. This is the implementation contract
 - [x] `state_scores.tsv` reports `n_forks`, detected `n_bubbles`, and `colour_score` separately (VERSION 0.11.0)
 - [x] Example outputs under `examples/{toy,error,reads,benchmark}/data` are untracked and ignored; `examples/half/data` metrics JSONs stay until the #231 manifest (VERSION 0.11.1)
 - [x] `ensure_bench` and `load_bench_graph` take `root=` or `$BUBBLEBLOWER_BENCH_ROOT` for the bench directory (#1165, VERSION 0.12.0)
+- [x] Pin MetaMetro 0.20.1 (19a3edb) in environment.yml, CI, and the examples rule (#1169, VERSION 0.12.1)
 
 ## Benchmarks
 
