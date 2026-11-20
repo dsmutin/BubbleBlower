@@ -10,7 +10,7 @@ from __future__ import annotations
 import math
 import random
 import time
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 from bubbleblower.classify import Posterior, classify_bubble
 from bubbleblower.detect import Bubble, detect_bubbles
@@ -113,15 +113,7 @@ def _stamp_parents(bubbles: list[Bubble], parent_id: str | None) -> list[Bubble]
         return bubbles
     stamped = []
     for bubble in bubbles:
-        stamped.append(
-            Bubble(
-                bubble_id=bubble.bubble_id,
-                source=bubble.source,
-                sink=bubble.sink,
-                branches=bubble.branches,
-                parent_bubble_id=parent_id,
-            )
-        )
+        stamped.append(replace(bubble, parent_bubble_id=parent_id))
     return stamped
 
 
