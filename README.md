@@ -49,7 +49,7 @@ bubbleblower --cdbg path/to/cdbg --out-dir out --search greedy
 bubbleblower -o result.json
 ```
 
-With no graph, `bubbleblower` classifies the built-in strain bubble and prints JSON (`status`, `ok`, `decision`). `--search` is `greedy` (default), `beam`, or `mcmc`. Optional coverage tables `node_coverage.tsv` and `link_coverage.tsv` in the CDBG directory are read when present; coverage is not inferred when they are absent.
+With no graph, `bubbleblower` classifies the built-in strain bubble and prints JSON (`status`, `ok`, `decision`). `--search` is `greedy` (default), `beam`, or `mcmc`; `none` is a deprecated alias for `greedy`. Optional coverage tables `node_coverage.tsv` and `link_coverage.tsv` in the CDBG directory are read when present; coverage is not inferred when they are absent.
 
 ```bash
 python examples/toy/run.py

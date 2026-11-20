@@ -8,6 +8,7 @@ Check a box only after mandatory tests pass. This is the implementation contract
 - [x] A CGT is a view of that ToCUMG (`from_cgt`, `as_cgt`). It is not a second graph
 - [x] GFA and MEGAHIT FASTG enter through MetaMetro `gfa_to_cfa` and `fastg_to_cfa`
 - [x] Read colouring is MetaMetro `colour_by_read_accessions`; examples select ToCUMG namespaces
+- [x] CLI `--search` defaults to `greedy`; `none` is a deprecated alias (VERSION 0.10.5)
 
 ## Edits and launch criteria
 

@@ -48,9 +48,9 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--out-dir", default=None, help="directory for resolved graph and TSV tables")
     parser.add_argument(
         "--search",
-        choices=("none", "greedy", "beam", "mcmc"),
-        default="none",
-        help="search applied when --cdbg or --out-dir is set",
+        choices=("greedy", "beam", "mcmc", "none"),
+        default="greedy",
+        help="search applied when --cdbg or --out-dir is set (default: greedy; none is a deprecated alias for greedy)",
     )
     args = parser.parse_args(argv)
     if args.version:

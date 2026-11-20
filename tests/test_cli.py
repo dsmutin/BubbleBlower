@@ -25,3 +25,15 @@ def test_cli_baseline_stdout(capsys: pytest.CaptureFixture[str]) -> None:
     assert payload["status"] == "resolved"
     assert payload["ok"] is True
     assert payload["decision"] == "strain"
+
+
+def test_cli_search_defaults_to_greedy(tmp_path, capsys: pytest.CaptureFixture[str]) -> None:
+    """Without --search the CLI runs and reports greedy search."""
+    assert main(["--out-dir", str(tmp_path / "out")]) == 0
+    assert json.loads(capsys.readouterr().out)["search"] == "greedy"
+
+
+def test_cli_search_none_is_greedy_alias(tmp_path, capsys: pytest.CaptureFixture[str]) -> None:
+    """The deprecated value none still runs greedy search."""
+    assert main(["--out-dir", str(tmp_path / "out"), "--search", "none"]) == 0
+    assert json.loads(capsys.readouterr().out)["search"] == "greedy"
